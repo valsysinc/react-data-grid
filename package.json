@@ -24,6 +24,7 @@
     "*.less"
   ],
   "scripts": {
+    "prepare": "npm run build",
     "start": "start-storybook --quiet -p 6006",
     "build": "tsc",
     "postbuild": "node tools/buildStylesheets.mjs",
