@@ -12,6 +12,7 @@ function Cell<R, SR>({
   isCopied,
   isDraggedOver,
   isRowSelected,
+  highlight,
   row,
   rowIdx,
   eventBus,
@@ -34,7 +35,8 @@ function Cell<R, SR>({
       'rdg-cell-frozen-last': column.isLastFrozenColumn,
       'rdg-cell-selected': isCellSelected,
       'rdg-cell-copied': isCopied,
-      'rdg-cell-dragged-over': isDraggedOver
+      'rdg-cell-dragged-over': isDraggedOver,
+      'rdg-cell-highlight': highlight
     },
     typeof cellClass === 'function' ? cellClass(row) : cellClass,
     className

@@ -21,7 +21,7 @@ module.exports = function({ config, mode }) {
       options: { cacheDirectory: true }
     }, {
       loader: 'ts-loader',
-      options: { onlyCompileBundledFiles: true }
+      options: { transpileOnly: true }
     }]
   }, {
     test: /\.less$/,

@@ -7,6 +7,7 @@ import { RowRendererProps, SelectedCellProps } from './types';
 import { wrapEvent } from './utils';
 
 function Row<R, SR = unknown>({
+  cellHighlights,
   cellRenderer: CellRenderer = Cell,
   className,
   eventBus,
@@ -83,6 +84,7 @@ function Row<R, SR = unknown>({
             onFocus={isCellSelected ? (selectedCellProps as SelectedCellProps).onFocus : undefined}
             onKeyDown={isCellSelected ? selectedCellProps!.onKeyDown : undefined}
             onRowClick={onRowClick}
+            highlight={cellHighlights?.[rowIdx]?.[column.idx]}
           />
         );
       })}

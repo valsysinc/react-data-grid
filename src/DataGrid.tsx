@@ -131,6 +131,7 @@ export interface DataGridProps<R, K extends keyof R, SR = unknown> extends Share
   rowGrouper?: (rows: readonly R[], columnKey: string) => Dictionary<readonly R[]>;
   expandedGroupIds?: ReadonlySet<unknown>;
   onExpandedGroupIdsChange?: (expandedGroupIds: Set<unknown>) => void;
+  cellHighlights: unknown;
 
   /**
    * Custom renderers
@@ -223,7 +224,8 @@ function DataGrid<R, K extends keyof R, SR>({
   // ARIA
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
-  'aria-describedby': ariaDescribedBy
+  'aria-describedby': ariaDescribedBy,
+  cellHighlights
 }: DataGridProps<R, K, SR>, ref: React.Ref<DataGridHandle>) {
   /**
    * states
@@ -236,6 +238,8 @@ function DataGrid<R, K extends keyof R, SR>({
   const [copiedPosition, setCopiedPosition] = useState<Position & { value: unknown } | null>(null);
   const [isDragging, setDragging] = useState(false);
   const [draggedOverRowIdx, setOverRowIdx] = useState<number | undefined>(undefined);
+  //const [cellHighlights, setCellHighlights] = useState([]);
+  console.log('DG', cellHighlights);
 
   const setDraggedOverRowIdx = useCallback((rowIdx?: number) => {
     setOverRowIdx(rowIdx);
@@ -867,6 +871,7 @@ function DataGrid<R, K extends keyof R, SR>({
         <RowRenderer
           aria-rowindex={headerRowsCount + (hasGroups ? startRowIndex : rowIdx) + 1} // aria-rowindex is 1 based
           aria-selected={isSelectable ? isRowSelected : undefined}
+          cellHighlights={cellHighlights}
           key={key}
           rowIdx={rowIdx}
           row={row}

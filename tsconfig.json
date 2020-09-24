@@ -14,8 +14,8 @@
     "pretty": true,
     "sourceMap": true,
     "strict": true,
-    "target": "es2020",
-    "types": ["jest"]
+    "target": "es2018",
+    "types": ["jest"],
   },
   "files": [
     "src/index.ts"

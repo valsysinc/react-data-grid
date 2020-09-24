@@ -176,12 +176,14 @@ export interface CellRendererProps<TRow, TSummaryRow = unknown> extends Omit<Rea
   eventBus: EventBus;
   dragHandleProps?: Pick<React.HTMLAttributes<HTMLDivElement>, 'onMouseDown' | 'onDoubleClick'>;
   onRowClick?: (rowIdx: number, row: TRow, column: CalculatedColumn<TRow, TSummaryRow>) => void;
+  highlight: any;
 }
 
 export interface RowRendererProps<TRow, TSummaryRow = unknown> extends Omit<React.HTMLAttributes<HTMLDivElement>, 'style' | 'children'> {
   viewportColumns: readonly CalculatedColumn<TRow, TSummaryRow>[];
   row: TRow;
   cellRenderer?: React.ComponentType<CellRendererProps<TRow, TSummaryRow>>;
+  cellHighlights: any;
   rowIdx: number;
   copiedCellIdx?: number;
   draggedOverCellIdx?: number;

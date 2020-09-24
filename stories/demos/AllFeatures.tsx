@@ -220,11 +220,17 @@ export default function AllFeatures() {
     setIsLoading(false);
   }
 
+  const highlights = [];
+  highlights[2] = [];
+  highlights[2][3] = true;
+  highlights[2][5] = true;
+
   return (
     <div className="all-features">
       <Toolbar onAddRow={handleAddRow} numberOfRows={rows.length} />
       <DataGrid
         ref={gridRef}
+        cellHighlights={highlights}
         columns={columns}
         rows={rows}
         rowKey="id"
