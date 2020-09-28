@@ -70,6 +70,7 @@ export interface CalculatedColumn<TRow, TSummaryRow = unknown> extends Column<TR
 export interface Position {
   idx: number;
   rowIdx: number;
+  sel?: GridSelection;
 }
 
 export interface Editor<TValue = never> {
@@ -149,6 +150,9 @@ export interface SharedEditorContainerProps {
 
 interface SelectedCellPropsBase {
   idx: number;
+  rowIdx: number;
+  hasSelectedCells: boolean;
+  selection: GridSelection | undefined;
   onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void;
 }
 
@@ -171,6 +175,7 @@ export interface CellRendererProps<TRow, TSummaryRow = unknown> extends Omit<Rea
   row: TRow;
   isCopied: boolean;
   isDraggedOver: boolean;
+  isCellFocused: boolean;
   isCellSelected: boolean;
   isRowSelected: boolean;
   eventBus: EventBus;
@@ -262,4 +267,11 @@ export interface GroupRow<TRow> {
   posInSet: number;
   setSize: number;
   startRowIndex: number;
+}
+
+export interface GridSelection {
+  colStart: number;
+  colEnd: number;
+  rowStart: number;
+  rowEnd: number;
 }

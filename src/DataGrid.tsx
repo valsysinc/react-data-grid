@@ -32,6 +32,7 @@ import {
   CheckCellIsEditableEvent,
   Column,
   Filters,
+  GridSelection,
   Position,
   RowRendererProps,
   RowsUpdateEvent,
@@ -238,8 +239,7 @@ function DataGrid<R, K extends keyof R, SR>({
   const [copiedPosition, setCopiedPosition] = useState<Position & { value: unknown } | null>(null);
   const [isDragging, setDragging] = useState(false);
   const [draggedOverRowIdx, setOverRowIdx] = useState<number | undefined>(undefined);
-  //const [cellHighlights, setCellHighlights] = useState([]);
-  console.log('DG', cellHighlights);
+
 
   const setDraggedOverRowIdx = useCallback((rowIdx?: number) => {
     setOverRowIdx(rowIdx);
@@ -299,7 +299,17 @@ function DataGrid<R, K extends keyof R, SR>({
   useLayoutEffect(() => {
     if (selectedPosition === prevSelectedPosition.current || selectedPosition.mode === 'EDIT' || !isCellWithinBounds(selectedPosition)) return;
     prevSelectedPosition.current = selectedPosition;
-    scrollToCell(selectedPosition);
+    if (selectedPosition.sel && selectedPosition.sel !== prevSelectedPosition.sel) {
+      let newSelIdx; let newSelRowIdx;
+      if (!prevSelectedPosition.sel) {
+        newSelIdx = selectedPosition.idx === selectedPosition.sel.colStart ? selectedPosition.sel.colEnd : selectedPosition.sel.colStart;
+        newSelRowIdx = selectedPosition.rowIdx === selectedPosition.sel.rowStart ? selectedPosition.sel.rowEnd : selectedPosition.sel.rowStart;
+      } else {
+        newSelIdx = selectedPosition.sel.colStart !== prevSelectedPosition.sel.colStart ? selectedPosition.sel.colStart : selectedPosition.sel.colEnd;
+        newSelRowIdx = selectedPosition.sel.rowStart !== prevSelectedPosition.sel.rowStart ? selectedPosition.sel.rowStart : selectedPosition.sel.rowEnd;
+      }
+      scrollToCell({ idx: newSelIdx, rowIdx: newSelRowIdx });
+    } else scrollToCell(selectedPosition);
 
     if (isCellFocusable.current) {
       isCellFocusable.current = false;
@@ -639,6 +649,10 @@ function DataGrid<R, K extends keyof R, SR>({
     return rowIdx >= 0 && rowIdx < rows.length && idx >= minColIdx && idx < columns.length;
   }
 
+  function isCellSelectionWithinBounds({ rowStart, rowEnd, colStart, colEnd }: GridSelection): boolean {
+    return rowStart >= 0 && rowEnd < rows.length && colStart >= minColIdx && colEnd < columns.length;
+  }
+
   function isCellEditable(position: Position): boolean {
     return isCellWithinBounds(position)
       && isSelectedCellEditable<R, SR>({ columns, rows, selectedPosition: position, onCheckCellIsEditable, isGroupRow });
@@ -646,6 +660,7 @@ function DataGrid<R, K extends keyof R, SR>({
 
   function selectCell(position: Position, enableEditor = false): void {
     if (!isCellWithinBounds(position)) return;
+    if (position.sel && !isCellSelectionWithinBounds(position.sel)) return;
     commitEditor2Changes();
 
     if (enableEditor && isCellEditable(position)) {
@@ -688,8 +703,33 @@ function DataGrid<R, K extends keyof R, SR>({
     }
   }
 
+  function updateSelection(cse: string, row: number, col: number, sel: GridSelection | undefined): GridSelection {
+    if (!sel) sel = { rowStart: row, rowEnd: row, colStart: col, colEnd: col };
+    else sel = { ...sel };
+    switch (cse) {
+      case 'ArrowUp':
+        if (sel.rowEnd > row) sel.rowEnd -= 1;
+        else sel.rowStart -= 1;
+        return sel;
+      case 'ArrowDown':
+        if (sel.rowStart < row) sel.rowStart += 1;
+        else sel.rowEnd += 1;
+        return sel;
+      case 'ArrowLeft':
+        if (sel.colEnd > col) sel.colEnd -= 1;
+        else sel.colStart -= 1;
+        return sel;
+      case 'ArrowRight':
+        if (sel.colStart < col) sel.colStart += 1;
+        else sel.colEnd += 1;
+        return sel;
+      default:
+        return sel;
+    }
+  }
+
   function getNextPosition(key: string, ctrlKey: boolean, shiftKey: boolean): Position {
-    const { idx, rowIdx } = selectedPosition;
+    const { idx, rowIdx, sel } = selectedPosition;
     const row = rows[rowIdx];
     const isRowSelected = isCellWithinBounds(selectedPosition) && idx === -1;
 
@@ -716,12 +756,16 @@ function DataGrid<R, K extends keyof R, SR>({
 
     switch (key) {
       case 'ArrowUp':
+        if (shiftKey) return { idx, rowIdx, sel: updateSelection(key, rowIdx, idx, sel) };
         return { idx, rowIdx: rowIdx - 1 };
       case 'ArrowDown':
+        if (shiftKey) return { idx, rowIdx, sel: updateSelection(key, rowIdx, idx, sel) };
         return { idx, rowIdx: rowIdx + 1 };
       case 'ArrowLeft':
+        if (shiftKey) return { idx, rowIdx, sel: updateSelection(key, rowIdx, idx, sel) };
         return { idx: idx - 1, rowIdx };
       case 'ArrowRight':
+        if (shiftKey) return { idx, rowIdx, sel: updateSelection(key, rowIdx, idx, sel) };
         return { idx: idx + 1, rowIdx };
       case 'Tab':
         if (selectedPosition.idx === -1 && selectedPosition.rowIdx === -1) {
@@ -786,13 +830,26 @@ function DataGrid<R, K extends keyof R, SR>({
     return isDraggedOver ? selectedPosition.idx : undefined;
   }
 
+  const hasSelectedCells = function(rowIdx: number): boolean {
+    const sel = selectedPosition?.sel;
+    if (!sel) return false;
+    if (sel.rowStart <= rowIdx && sel.rowEnd >= rowIdx) {
+      return true;
+    }
+    return false;
+  };
+
   function getSelectedCellProps(rowIdx: number): SelectedCellProps | EditCellProps<R> | undefined {
-    if (selectedPosition.rowIdx !== rowIdx) return;
+    const selectedCells = hasSelectedCells(rowIdx);
+    if (selectedPosition.rowIdx !== rowIdx && !selectedCells) return;
 
     if (selectedPosition.mode === 'EDIT') {
       return {
         mode: 'EDIT',
         idx: selectedPosition.idx,
+        hasSelectedCells: selectedCells,
+        rowIdx: selectedPosition.rowIdx,
+        selection: selectedPosition.sel,
         onKeyDown: handleKeyDown,
         editorPortalTarget,
         editorContainerProps: {
@@ -815,6 +872,9 @@ function DataGrid<R, K extends keyof R, SR>({
     return {
       mode: 'SELECT',
       idx: selectedPosition.idx,
+      rowIdx: selectedPosition.rowIdx,
+      hasSelectedCells: selectedCells,
+      selection: selectedPosition.sel,
       onFocus: handleFocus,
       onKeyDown: handleKeyDown,
       dragHandleProps: enableCellDragAndDrop && isCellEditable(selectedPosition)

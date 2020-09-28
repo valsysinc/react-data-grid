@@ -27,7 +27,7 @@ interface GetNextSelectedCellPositionOpts<R, SR> {
 
 export function getNextSelectedCellPosition<R, SR>({ cellNavigationMode, columns, rowsCount, nextPosition }: GetNextSelectedCellPositionOpts<R, SR>): Position {
   if (cellNavigationMode !== 'NONE') {
-    const { idx, rowIdx } = nextPosition;
+    const { idx, rowIdx, sel } = nextPosition;
     const columnsCount = columns.length;
     const isAfterLastColumn = idx === columnsCount;
     const isBeforeFirstColumn = idx === -1;
@@ -38,13 +38,15 @@ export function getNextSelectedCellPosition<R, SR>({ cellNavigationMode, columns
         if (!isLastRow) {
           return {
             idx: 0,
-            rowIdx: rowIdx + 1
+            rowIdx: rowIdx + 1,
+            sel
           };
         }
       } else if (cellNavigationMode === 'LOOP_OVER_ROW') {
         return {
           rowIdx,
-          idx: 0
+          idx: 0,
+          sel
         };
       }
     } else if (isBeforeFirstColumn) {
@@ -53,13 +55,15 @@ export function getNextSelectedCellPosition<R, SR>({ cellNavigationMode, columns
         if (!isFirstRow) {
           return {
             rowIdx: rowIdx - 1,
-            idx: columnsCount - 1
+            idx: columnsCount - 1,
+            sel
           };
         }
       } else if (cellNavigationMode === 'LOOP_OVER_ROW') {
         return {
           rowIdx,
-          idx: columnsCount - 1
+          idx: columnsCount - 1,
+          sel
         };
       }
     }

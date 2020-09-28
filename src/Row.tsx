@@ -41,6 +41,16 @@ function Row<R, SR = unknown>({
     className
   );
 
+  const isCellSelected = function(rowIdx: number, colIdx: number): boolean {
+    const sel = selectedCellProps?.selection;
+    if (!sel) return false;
+    if (selectedCellProps?.idx === colIdx && selectedCellProps?.rowIdx === rowIdx) return false;
+    if (sel.rowStart <= rowIdx && sel.rowEnd >= rowIdx && sel.colStart <= colIdx && sel.colEnd >= colIdx) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <div
       role="row"
@@ -53,8 +63,10 @@ function Row<R, SR = unknown>({
       {...props}
     >
       {viewportColumns.map(column => {
-        const isCellSelected = selectedCellProps?.idx === column.idx;
-        if (selectedCellProps?.mode === 'EDIT' && isCellSelected) {
+        const isCellFocused = selectedCellProps?.idx === column.idx && selectedCellProps?.rowIdx === rowIdx;
+        const cellSelected = selectedCellProps?.hasSelectedCells ? isCellSelected(rowIdx, column.idx) : false;
+
+        if (selectedCellProps?.mode === 'EDIT' && isCellFocused) {
           return (
             <EditCell<R, SR>
               key={column.key}
@@ -77,14 +89,15 @@ function Row<R, SR = unknown>({
             row={row}
             isCopied={copiedCellIdx === column.idx}
             isDraggedOver={draggedOverCellIdx === column.idx}
-            isCellSelected={isCellSelected}
+            isCellFocused={isCellFocused}
             isRowSelected={isRowSelected}
             eventBus={eventBus}
-            dragHandleProps={isCellSelected ? (selectedCellProps as SelectedCellProps).dragHandleProps : undefined}
-            onFocus={isCellSelected ? (selectedCellProps as SelectedCellProps).onFocus : undefined}
-            onKeyDown={isCellSelected ? selectedCellProps!.onKeyDown : undefined}
+            dragHandleProps={isCellFocused ? (selectedCellProps as SelectedCellProps).dragHandleProps : undefined}
+            onFocus={isCellFocused ? (selectedCellProps as SelectedCellProps).onFocus : undefined}
+            onKeyDown={isCellFocused ? selectedCellProps!.onKeyDown : undefined}
             onRowClick={onRowClick}
             highlight={cellHighlights?.[rowIdx]?.[column.idx]}
+            isCellSelected={cellSelected}
           />
         );
       })}

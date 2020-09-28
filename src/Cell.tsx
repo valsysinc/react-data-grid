@@ -8,11 +8,12 @@ import { useCombinedRefs } from './hooks';
 function Cell<R, SR>({
   className,
   column,
-  isCellSelected,
+  isCellFocused,
   isCopied,
   isDraggedOver,
   isRowSelected,
   highlight,
+  isCellSelected,
   row,
   rowIdx,
   eventBus,
@@ -26,17 +27,17 @@ function Cell<R, SR>({
   ...props
 }: CellRendererProps<R, SR>, ref: React.Ref<HTMLDivElement>) {
   const cellRef = useRef<HTMLDivElement>(null);
-
   const { cellClass } = column;
   className = clsx(
     'rdg-cell',
     {
       'rdg-cell-frozen': column.frozen,
       'rdg-cell-frozen-last': column.isLastFrozenColumn,
-      'rdg-cell-selected': isCellSelected,
+      'rdg-cell-focused': isCellFocused,
       'rdg-cell-copied': isCopied,
       'rdg-cell-dragged-over': isDraggedOver,
-      'rdg-cell-highlight': highlight
+      'rdg-cell-highlight': highlight,
+      'rdg-cell-selected': isCellSelected
     },
     typeof cellClass === 'function' ? cellClass(row) : cellClass,
     className
@@ -67,7 +68,7 @@ function Cell<R, SR>({
     <div
       role="gridcell"
       aria-colindex={column.idx + 1} // aria-colindex is 1-based
-      aria-selected={isCellSelected}
+      aria-selected={isCellFocused}
       ref={useCombinedRefs(cellRef, ref)}
       className={className}
       style={{
@@ -87,7 +88,7 @@ function Cell<R, SR>({
             column={column}
             rowIdx={rowIdx}
             row={row}
-            isCellSelected={isCellSelected}
+            isCellSelected={isCellFocused}
             isRowSelected={isRowSelected}
             onRowSelectionChange={onRowSelectionChange}
           />
