@@ -299,14 +299,14 @@ function DataGrid<R, K extends keyof R, SR>({
   useLayoutEffect(() => {
     if (selectedPosition === prevSelectedPosition.current || selectedPosition.mode === 'EDIT' || !isCellWithinBounds(selectedPosition)) return;
     prevSelectedPosition.current = selectedPosition;
-    if (selectedPosition.sel && selectedPosition.sel !== prevSelectedPosition.sel) {
+    if (selectedPosition.sel && selectedPosition.sel !== prevSelectedPosition.current.sel) {
       let newSelIdx; let newSelRowIdx;
-      if (!prevSelectedPosition.sel) {
+      if (!prevSelectedPosition.current.sel) {
         newSelIdx = selectedPosition.idx === selectedPosition.sel.colStart ? selectedPosition.sel.colEnd : selectedPosition.sel.colStart;
         newSelRowIdx = selectedPosition.rowIdx === selectedPosition.sel.rowStart ? selectedPosition.sel.rowEnd : selectedPosition.sel.rowStart;
       } else {
-        newSelIdx = selectedPosition.sel.colStart !== prevSelectedPosition.sel.colStart ? selectedPosition.sel.colStart : selectedPosition.sel.colEnd;
-        newSelRowIdx = selectedPosition.sel.rowStart !== prevSelectedPosition.sel.rowStart ? selectedPosition.sel.rowStart : selectedPosition.sel.rowEnd;
+        newSelIdx = selectedPosition.sel.colStart !== prevSelectedPosition.current.sel.colStart ? selectedPosition.sel.colStart : selectedPosition.sel.colEnd;
+        newSelRowIdx = selectedPosition.sel.rowStart !== prevSelectedPosition.current.sel.rowStart ? selectedPosition.sel.rowStart : selectedPosition.sel.rowEnd;
       }
       scrollToCell({ idx: newSelIdx, rowIdx: newSelRowIdx });
     } else scrollToCell(selectedPosition);
