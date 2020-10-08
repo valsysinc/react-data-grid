@@ -4,7 +4,6 @@ import clsx from 'clsx';
 import Cell from './Cell';
 import EditCell from './EditCell';
 import { RowRendererProps, SelectedCellProps } from './types';
-import { wrapEvent } from './utils';
 
 function Row<R, SR = unknown>({
   cellHighlights,
@@ -18,19 +17,17 @@ function Row<R, SR = unknown>({
   row,
   viewportColumns,
   selectedCellProps,
+  enableDrag,
   onRowClick,
   rowClass,
-  setDraggedOverRowIdx,
+  setDraggedOverPos,
   onMouseEnter,
+  cellMouseDownHandler,
   top,
   'aria-rowindex': ariaRowIndex,
   'aria-selected': ariaSelected,
   ...props
 }: RowRendererProps<R, SR>, ref: React.Ref<HTMLDivElement>) {
-  function handleDragEnter() {
-    setDraggedOverRowIdx?.(rowIdx);
-  }
-
   className = clsx(
     'rdg-row',
     `rdg-row-${rowIdx % 2 === 0 ? 'even' : 'odd'}`, {
@@ -51,6 +48,14 @@ function Row<R, SR = unknown>({
     return false;
   };
 
+  const isDraggedOver = function(idx: number): boolean {
+    if (idx === undefined || draggedOverCellIdx === undefined || !selectedCellProps
+    || (idx === selectedCellProps.idx && rowIdx === selectedCellProps.rowIdx)) return false;
+    return draggedOverCellIdx < selectedCellProps?.idx
+      ? idx <= selectedCellProps?.idx && idx >= draggedOverCellIdx
+      : idx >= selectedCellProps?.idx && idx <= draggedOverCellIdx;
+  };
+
   return (
     <div
       role="row"
@@ -58,7 +63,7 @@ function Row<R, SR = unknown>({
       aria-selected={ariaSelected}
       ref={ref}
       className={className}
-      onMouseEnter={wrapEvent(handleDragEnter, onMouseEnter)}
+      onMouseEnter={onMouseEnter}
       style={{ top }}
       {...props}
     >
@@ -88,16 +93,18 @@ function Row<R, SR = unknown>({
             column={column}
             row={row}
             isCopied={copiedCellIdx === column.idx}
-            isDraggedOver={draggedOverCellIdx === column.idx}
+            isDraggedOver={isDraggedOver(column.idx)}
             isCellFocused={isCellFocused}
             isRowSelected={isRowSelected}
             eventBus={eventBus}
-            dragHandleProps={isCellFocused ? (selectedCellProps as SelectedCellProps).dragHandleProps : undefined}
             onFocus={isCellFocused ? (selectedCellProps as SelectedCellProps).onFocus : undefined}
             onKeyDown={isCellFocused ? selectedCellProps!.onKeyDown : undefined}
             onRowClick={onRowClick}
             highlight={cellHighlights?.[rowIdx]?.[column.idx]}
             isCellSelected={cellSelected}
+            enableDrag={isCellFocused ? enableDrag : false}
+            setDraggedOverPos={setDraggedOverPos}
+            cellMouseDownHandler={cellMouseDownHandler}
           />
         );
       })}

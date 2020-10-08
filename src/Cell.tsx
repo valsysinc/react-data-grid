@@ -17,17 +17,25 @@ function Cell<R, SR>({
   row,
   rowIdx,
   eventBus,
-  dragHandleProps,
+  enableDrag,
   onRowClick,
   onFocus,
   onKeyDown,
   onClick,
   onDoubleClick,
   onContextMenu,
-  ...props
+  onMouseEnter,
+  onMouseDown,
+  cellMouseDownHandler,
+  setDraggedOverPos
 }: CellRendererProps<R, SR>, ref: React.Ref<HTMLDivElement>) {
   const cellRef = useRef<HTMLDivElement>(null);
   const { cellClass } = column;
+
+  function handleDragEnter() {
+    setDraggedOverPos?.(rowIdx, column.idx);
+  }
+
   className = clsx(
     'rdg-cell',
     {
@@ -50,6 +58,11 @@ function Cell<R, SR>({
   function handleClick() {
     selectCell(column.editorOptions?.editOnClick);
     onRowClick?.(rowIdx, row, column);
+  }
+
+  function handleMouseDown(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    selectCell();
+    cellMouseDownHandler(event, rowIdx, column.idx);
   }
 
   function handleContextMenu() {
@@ -80,7 +93,8 @@ function Cell<R, SR>({
       onClick={wrapEvent(handleClick, onClick)}
       onDoubleClick={wrapEvent(handleDoubleClick, onDoubleClick)}
       onContextMenu={wrapEvent(handleContextMenu, onContextMenu)}
-      {...props}
+      onMouseEnter={wrapEvent(handleDragEnter, onMouseEnter)}
+      onMouseDown={wrapEvent(handleMouseDown, onMouseDown)}
     >
       {!column.rowGroup && (
         <>
@@ -92,8 +106,11 @@ function Cell<R, SR>({
             isRowSelected={isRowSelected}
             onRowSelectionChange={onRowSelectionChange}
           />
-          {dragHandleProps && (
-            <div className="rdg-cell-drag-handle" {...dragHandleProps} />
+          {enableDrag && (
+            <div
+              id="rdg-drag-handle"
+              className="rdg-cell-drag-handle"
+            />
           )}
         </>
       )}
