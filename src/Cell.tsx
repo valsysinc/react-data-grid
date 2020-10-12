@@ -23,7 +23,6 @@ function Cell<R, SR>({
   onKeyDown,
   onClick,
   onDoubleClick,
-  onContextMenu,
   onMouseEnter,
   onMouseDown,
   cellMouseDownHandler,
@@ -61,12 +60,8 @@ function Cell<R, SR>({
   }
 
   function handleMouseDown(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    selectCell();
+    if (!isCellSelected && !isCellFocused) selectCell();
     cellMouseDownHandler(event, rowIdx, column.idx);
-  }
-
-  function handleContextMenu() {
-    selectCell();
   }
 
   function handleDoubleClick() {
@@ -92,7 +87,6 @@ function Cell<R, SR>({
       onKeyDown={onKeyDown}
       onClick={wrapEvent(handleClick, onClick)}
       onDoubleClick={wrapEvent(handleDoubleClick, onDoubleClick)}
-      onContextMenu={wrapEvent(handleContextMenu, onContextMenu)}
       onMouseEnter={wrapEvent(handleDragEnter, onMouseEnter)}
       onMouseDown={wrapEvent(handleMouseDown, onMouseDown)}
     >
