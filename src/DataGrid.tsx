@@ -600,10 +600,9 @@ function DataGrid<R, K extends keyof R, SR>({
       });
     }
 
-    setSelectedPosition({
+    selectCell({
       rowIdx,
       idx,
-      mode: 'SELECT',
       sel: {
         rowStart: Math.min(latestDraggedOverPos.current.rowIdx, rowIdx),
         rowEnd: Math.max(latestDraggedOverPos.current.rowIdx, rowIdx),
