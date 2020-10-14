@@ -43,8 +43,8 @@ function Cell<R, SR>({
       'rdg-cell-focused': isCellFocused,
       'rdg-cell-copied': isCopied,
       'rdg-cell-dragged-over': isDraggedOver,
-      'rdg-cell-highlight': highlight,
-      'rdg-cell-selected': isCellSelected
+      'rdg-cell-selected': isCellSelected,
+      [highlight]: true
     },
     typeof cellClass === 'function' ? cellClass(row) : cellClass,
     className

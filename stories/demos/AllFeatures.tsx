@@ -222,8 +222,9 @@ export default function AllFeatures() {
 
   const highlights = [];
   highlights[2] = [];
-  highlights[2][3] = true;
-  highlights[2][5] = true;
+  highlights[3] = [];
+  highlights[2][3] = 'rdg-cell-highlight';
+  highlights[3][2] = 'rdg-cell-highlight2';
 
   return (
     <div className="all-features">
