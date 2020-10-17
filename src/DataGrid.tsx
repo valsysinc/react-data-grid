@@ -701,6 +701,7 @@ function DataGrid<R, K extends keyof R, SR>({
       setSelectedPosition({ ...position, mode: 'SELECT' });
     }
     onSelectedCellChange?.({ ...position });
+    focusSinkRef.current!.focus();
   }
 
   function closeEditor() {
