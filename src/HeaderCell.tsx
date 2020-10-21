@@ -29,6 +29,7 @@ export interface HeaderCellProps<R, SR> extends SharedHeaderRowProps<R, SR> {
   column: CalculatedColumn<R, SR>;
   onResize: (column: CalculatedColumn<R, SR>, width: number) => void;
   onAllRowsSelectionChange: (checked: boolean) => void;
+  handleClick: (event: React.MouseEvent<HTMLDivElement>, idx: number) => void;
 }
 
 export default function HeaderCell<R, SR>({
@@ -38,12 +39,17 @@ export default function HeaderCell<R, SR>({
   onAllRowsSelectionChange,
   sortColumn,
   sortDirection,
-  onSort
+  onSort,
+  handleClick
 }: HeaderCellProps<R, SR>) {
   function getCell() {
     if (!column.headerRenderer) return column.name;
 
     return createElement(column.headerRenderer, { column, allRowsSelected, onAllRowsSelectionChange });
+  }
+
+  function handleHeaderClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    handleClick(event, column.idx);
   }
 
   let cell = getCell();
@@ -63,7 +69,8 @@ export default function HeaderCell<R, SR>({
 
   const className = clsx('rdg-cell', column.headerCellClass, {
     'rdg-cell-frozen': column.frozen,
-    'rdg-cell-frozen-last': column.isLastFrozenColumn
+    'rdg-cell-frozen-last': column.isLastFrozenColumn,
+    'rdg-header-cell-start': column.idx === 0
   });
   const style: React.CSSProperties = {
     width: column.width,
@@ -77,6 +84,7 @@ export default function HeaderCell<R, SR>({
       aria-sort={sortColumn === column.key ? getAriaSort(sortDirection) : undefined}
       className={className}
       style={style}
+      onClick={handleHeaderClick}
     >
       {cell}
     </div>

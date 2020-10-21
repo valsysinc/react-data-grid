@@ -15,6 +15,17 @@
   height: var(--header-row-height);
   line-height: var(--header-row-height);
   top: 0;
+  cursor: s-resize;
+}
+
+.rdg-header-cell {
+  background-color: var(--header-background-color);
+  font-weight: bold;
+  cursor: e-resize;
+}
+
+.rdg-header-cell-start {
+  cursor: se-resize;
 }
 
 .rdg-filter-row {
@@ -41,7 +52,7 @@
 }
 
 .rdg-header-sort-cell {
-  cursor: pointer;
+  cursor: s-resize;
   display: flex;
 }
 

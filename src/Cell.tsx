@@ -42,8 +42,9 @@ function Cell<R, SR>({
       'rdg-cell-frozen-last': column.isLastFrozenColumn,
       'rdg-cell-focused': isCellFocused,
       'rdg-cell-copied': isCopied,
-      'rdg-cell-dragged-over': isDraggedOver,
       'rdg-cell-selected': isCellSelected,
+      'rdg-cell-dragged-over': isDraggedOver,
+      'rdg-header-cell': column.idx === 0,
       [highlight]: true
     },
     typeof cellClass === 'function' ? cellClass(row) : cellClass,
@@ -55,12 +56,23 @@ function Cell<R, SR>({
   }
 
   function handleClick() {
-    selectCell(column.editorOptions?.editOnClick);
+    if (column.idx === 0) {
+      eventBus.dispatch('SelectCell', {
+        rowIdx,
+        idx: 1,
+        sel: {
+          rowStart: rowIdx,
+          rowEnd: rowIdx,
+          colStart: 1,
+          colEnd: -1
+        }
+      });
+    } else selectCell(column.editorOptions?.editOnClick);
     onRowClick?.(rowIdx, row, column);
   }
 
   function handleMouseDown(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    if (!isCellSelected && !isCellFocused) selectCell();
+    if (!isCellSelected && !isCellFocused && column.idx !== 0) selectCell();
     cellMouseDownHandler(event, rowIdx, column.idx);
   }
 

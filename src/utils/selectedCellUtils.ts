@@ -30,14 +30,14 @@ export function getNextSelectedCellPosition<R, SR>({ cellNavigationMode, columns
     const { idx, rowIdx, sel } = nextPosition;
     const columnsCount = columns.length;
     const isAfterLastColumn = idx === columnsCount;
-    const isBeforeFirstColumn = idx === -1;
+    const isBeforeFirstColumn = idx === 0;
 
     if (isAfterLastColumn) {
       if (cellNavigationMode === 'CHANGE_ROW') {
         const isLastRow = rowIdx === rowsCount - 1;
         if (!isLastRow) {
           return {
-            idx: 0,
+            idx: 1,
             rowIdx: rowIdx + 1,
             sel
           };
@@ -45,7 +45,7 @@ export function getNextSelectedCellPosition<R, SR>({ cellNavigationMode, columns
       } else if (cellNavigationMode === 'LOOP_OVER_ROW') {
         return {
           rowIdx,
-          idx: 0,
+          idx: 1,
           sel
         };
       }
@@ -69,6 +69,7 @@ export function getNextSelectedCellPosition<R, SR>({ cellNavigationMode, columns
     }
   }
 
+  if (nextPosition.idx < 1) nextPosition.idx = 1;
   return nextPosition;
 }
 

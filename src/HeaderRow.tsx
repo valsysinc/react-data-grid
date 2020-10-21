@@ -18,6 +18,7 @@ export interface HeaderRowProps<R, K extends keyof R, SR> extends SharedDataGrid
   columns: readonly CalculatedColumn<R, SR>[];
   allRowsSelected: boolean;
   onColumnResize: (column: CalculatedColumn<R, SR>, width: number) => void;
+  handleClick: (event: React.MouseEvent<HTMLDivElement>, idx: number) => void;
 }
 
 function HeaderRow<R, K extends keyof R, SR>({
@@ -29,7 +30,8 @@ function HeaderRow<R, K extends keyof R, SR>({
   onColumnResize,
   sortColumn,
   sortDirection,
-  onSort
+  onSort,
+  handleClick
 }: HeaderRowProps<R, K, SR>) {
   const handleAllRowsSelectionChange = useCallback((checked: boolean) => {
     if (!onSelectedRowsChange) return;
@@ -61,6 +63,7 @@ function HeaderRow<R, K extends keyof R, SR>({
             allRowsSelected={allRowsSelected}
             onAllRowsSelectionChange={handleAllRowsSelectionChange}
             onSort={onSort}
+            handleClick={handleClick}
             sortColumn={sortColumn}
             sortDirection={sortDirection}
           />
