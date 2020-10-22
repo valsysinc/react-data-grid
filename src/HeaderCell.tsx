@@ -49,7 +49,7 @@ export default function HeaderCell<R, SR>({
   }
 
   function handleHeaderClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    handleClick(event, column.idx);
+    if ((event.target as Element).className !== 'rdg-header-cell-resizer') handleClick(event, column.idx);
   }
 
   let cell = getCell();

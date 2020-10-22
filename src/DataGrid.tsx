@@ -589,17 +589,8 @@ function DataGrid<R, K extends keyof R, SR>({
     const cellKey = column.key;
     const dragType = Math.abs(latestDraggedOverPos.current.idx - idx) > Math.abs(latestDraggedOverPos.current.rowIdx - rowIdx) ? 'col' : 'row';
     const value = rawRows[rowIdx][cellKey as keyof R];
-    if (selType === 2) {
-      onRowsUpdate?.({
-        cellKey,
-        fromRow: rowIdx,
-        toRow: latestDraggedOverPos.current.rowIdx,
-        fromCol: idx,
-        toCol: latestDraggedOverPos.current.idx,
-        updated: { [cellKey]: value } as unknown as never,
-        action: 'CELL_DRAG'
-      });
-    }
+    const selRowIdx = dragType === 'row' ? latestDraggedOverPos.current.rowIdx : rowIdx;
+    const selColIdx = dragType === 'col' ? latestDraggedOverPos.current.idx : idx;
 
     selectCell({
       rowIdx,
@@ -612,6 +603,19 @@ function DataGrid<R, K extends keyof R, SR>({
       }
     });
     setDraggedOverPos();
+
+    if (selType === 2) {
+      onRowsUpdate?.({
+        cellKey,
+        fromRow: Math.min(rowIdx, selRowIdx),
+        toRow: Math.max(rowIdx, selRowIdx),
+        fromCol: Math.min(idx, selColIdx),
+        toCol: Math.max(idx, selColIdx),
+        updated: { [cellKey]: value } as unknown as never,
+        direction: dragType,
+        action: 'CELL_DRAG'
+      });
+    }
   }
 
   function cellMouseDownHandler(event: React.MouseEvent<HTMLDivElement, MouseEvent>, rowIdx: number, idx: number) {

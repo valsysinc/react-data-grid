@@ -84,6 +84,12 @@ function Cell<R, SR>({
     eventBus.dispatch('SelectRow', { rowIdx, checked, isShiftClick });
   }
 
+  const cellStyle = {
+    width: column.width,
+    left: column.left,
+    ...column.idx && { curosr: 'cell' }
+  };
+
   return (
     <div
       role="gridcell"
@@ -91,10 +97,7 @@ function Cell<R, SR>({
       aria-selected={isCellFocused}
       ref={useCombinedRefs(cellRef, ref)}
       className={className}
-      style={{
-        width: column.width,
-        left: column.left
-      }}
+      style={cellStyle}
       onFocus={onFocus}
       onKeyDown={onKeyDown}
       onClick={wrapEvent(handleClick, onClick)}
