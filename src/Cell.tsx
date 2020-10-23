@@ -12,7 +12,7 @@ function Cell<R, SR>({
   isCopied,
   isDraggedOver,
   isRowSelected,
-  highlight,
+  cellStyles,
   isCellSelected,
   row,
   rowIdx,
@@ -35,21 +35,31 @@ function Cell<R, SR>({
     setDraggedOverPos?.(rowIdx, column.idx);
   }
 
+  const externalClasses: {[key: string]: boolean | undefined} = {
+    'rdg-cell-frozen': column.frozen,
+    'rdg-cell-frozen-last': column.isLastFrozenColumn,
+    'rdg-cell-focused': isCellFocused,
+    'rdg-cell-copied': isCopied,
+    'rdg-cell-selected': isCellSelected,
+    'rdg-cell-dragged-over': isDraggedOver,
+    'rdg-row-header-cell': column.idx === 0
+  };
+
+  const staticCSSClasses = `rdg-cell ${cellStyles?.classes}`;
+
   className = clsx(
-    'rdg-cell',
-    {
-      'rdg-cell-frozen': column.frozen,
-      'rdg-cell-frozen-last': column.isLastFrozenColumn,
-      'rdg-cell-focused': isCellFocused,
-      'rdg-cell-copied': isCopied,
-      'rdg-cell-selected': isCellSelected,
-      'rdg-cell-dragged-over': isDraggedOver,
-      'rdg-header-cell': column.idx === 0,
-      [highlight]: true
-    },
+    staticCSSClasses,
+    externalClasses,
     typeof cellClass === 'function' ? cellClass(row) : cellClass,
     className
   );
+
+  const cellStyle = {
+    width: column.width,
+    left: column.left,
+    ...column.idx && { cursor: 'cell' },
+    ...cellStyles?.style
+  };
 
   function selectCell(openEditor?: boolean) {
     eventBus.dispatch('SelectCell', { idx: column.idx, rowIdx }, openEditor);
@@ -83,12 +93,6 @@ function Cell<R, SR>({
   function onRowSelectionChange(checked: boolean, isShiftClick: boolean) {
     eventBus.dispatch('SelectRow', { rowIdx, checked, isShiftClick });
   }
-
-  const cellStyle = {
-    width: column.width,
-    left: column.left,
-    ...column.idx && { curosr: 'cell' }
-  };
 
   return (
     <div

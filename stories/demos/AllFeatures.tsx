@@ -220,18 +220,24 @@ export default function AllFeatures() {
     setIsLoading(false);
   }
 
-  const highlights = [];
-  highlights[2] = [];
-  highlights[3] = [];
-  highlights[2][3] = 'rdg-cell-highlight';
-  highlights[3][2] = 'rdg-cell-highlight2';
+  const styles = [];
+  styles[2] = [];
+  styles[3] = [];
+  styles[2][3] = {
+    classes: ['rdg-cell-highlight'],
+    style: { 'font-weight': 'bold' }
+  };
+  styles[3][2] = {
+    classes: 'rdg-cell-highlight rdg-cell-highlight2',
+    style: { 'text-decoration': 'underline' }
+  };
 
   return (
     <div className="all-features">
       <Toolbar onAddRow={handleAddRow} numberOfRows={rows.length} />
       <DataGrid
         ref={gridRef}
-        cellHighlights={highlights}
+        cellStyles={styles}
         columns={columns}
         rows={rows}
         rowKey="id"

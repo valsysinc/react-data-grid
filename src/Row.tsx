@@ -6,7 +6,7 @@ import EditCell from './EditCell';
 import { RowRendererProps, SelectedCellProps } from './types';
 
 function Row<R, SR = unknown>({
-  cellHighlights,
+  cellStyles,
   cellRenderer: CellRenderer = Cell,
   className,
   eventBus,
@@ -100,7 +100,7 @@ function Row<R, SR = unknown>({
             onFocus={isCellFocused ? (selectedCellProps as SelectedCellProps).onFocus : undefined}
             onKeyDown={isCellFocused ? selectedCellProps!.onKeyDown : undefined}
             onRowClick={onRowClick}
-            highlight={cellHighlights?.[rowIdx]?.[column.idx]}
+            cellStyles={cellStyles?.[rowIdx]?.[column.idx]}
             isCellSelected={cellSelected}
             enableDrag={isCellFocused ? enableDrag : false}
             setDraggedOverPos={setDraggedOverPos}

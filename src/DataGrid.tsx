@@ -132,7 +132,7 @@ export interface DataGridProps<R, K extends keyof R, SR = unknown> extends Share
   rowGrouper?: (rows: readonly R[], columnKey: string) => Dictionary<readonly R[]>;
   expandedGroupIds?: ReadonlySet<unknown>;
   onExpandedGroupIdsChange?: (expandedGroupIds: Set<unknown>) => void;
-  cellHighlights: unknown;
+  cellStyles: unknown;
 
   /**
    * Custom renderers
@@ -226,7 +226,7 @@ function DataGrid<R, K extends keyof R, SR>({
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
   'aria-describedby': ariaDescribedBy,
-  cellHighlights
+  cellStyles
 }: DataGridProps<R, K, SR>, ref: React.Ref<DataGridHandle>) {
   /**
    * states
@@ -1036,7 +1036,7 @@ function DataGrid<R, K extends keyof R, SR>({
         <RowRenderer
           aria-rowindex={headerRowsCount + (hasGroups ? startRowIndex : rowIdx) + 1} // aria-rowindex is 1 based
           aria-selected={isSelectable ? isRowSelected : undefined}
-          cellHighlights={cellHighlights}
+          cellStyles={cellStyles}
           key={key}
           rowIdx={rowIdx}
           row={row}
