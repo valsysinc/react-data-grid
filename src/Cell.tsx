@@ -87,7 +87,7 @@ function Cell<R, SR>({
   }
 
   function handleDoubleClick() {
-    selectCell(true);
+    if (column.idx === 0) selectCell(true);
   }
 
   function onRowSelectionChange(checked: boolean, isShiftClick: boolean) {

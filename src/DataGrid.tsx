@@ -711,7 +711,7 @@ function DataGrid<R, K extends keyof R, SR>({
     if (position.sel && !isCellSelectionWithinBounds(position.sel)) return;
     commitEditor2Changes();
 
-    if (enableEditor && isCellEditable(position)) {
+    if (enableEditor && (isCellEditable(position) || position.idx === 0)) {
       const row = rows[position.rowIdx] as R;
       setSelectedPosition({ ...position, mode: 'EDIT', key: null, row, originalRow: row });
     } else {
@@ -723,7 +723,7 @@ function DataGrid<R, K extends keyof R, SR>({
 
   function closeEditor() {
     if (selectedPosition.mode === 'SELECT') return;
-    setSelectedPosition(({ idx, rowIdx }) => ({ idx, rowIdx, mode: 'SELECT' }));
+    setSelectedPosition(({ idx, rowIdx }) => ({ idx: idx || 1, rowIdx, mode: 'SELECT' }));
   }
 
   function scrollToCell({ idx, rowIdx }: Partial<Position>): void {
