@@ -132,7 +132,7 @@ export interface DataGridProps<R, K extends keyof R, SR = unknown> extends Share
   rowGrouper?: (rows: readonly R[], columnKey: string) => Dictionary<readonly R[]>;
   expandedGroupIds?: ReadonlySet<unknown>;
   onExpandedGroupIdsChange?: (expandedGroupIds: Set<unknown>) => void;
-  cellStyles: unknown;
+  cellStyles?: unknown;
 
   /**
    * Custom renderers
@@ -316,7 +316,7 @@ function DataGrid<R, K extends keyof R, SR>({
       isCellFocusable.current = false;
       return;
     }
-    focusSinkRef.current!.focus();
+    focusSinkRef.current!.focus({ preventScroll: true });
   });
 
   useEffect(() => {
@@ -583,6 +583,7 @@ function DataGrid<R, K extends keyof R, SR>({
   }
 
   function handleDragEnd(rowIdx: number, idx: number, selType: number) {
+    focusSinkRef.current!.focus();
     if (latestDraggedOverPos.current === undefined) return;
 
     const column = columns[idx];

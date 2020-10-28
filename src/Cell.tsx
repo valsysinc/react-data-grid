@@ -21,7 +21,6 @@ function Cell<R, SR>({
   onRowClick,
   onFocus,
   onKeyDown,
-  onClick,
   onDoubleClick,
   onMouseEnter,
   onMouseDown,
@@ -65,7 +64,7 @@ function Cell<R, SR>({
     eventBus.dispatch('SelectCell', { idx: column.idx, rowIdx }, openEditor);
   }
 
-  function handleClick() {
+  function handleMouseDown(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     if (column.idx === 0) {
       eventBus.dispatch('SelectCell', {
         rowIdx,
@@ -77,13 +76,9 @@ function Cell<R, SR>({
           colEnd: -1
         }
       });
-    } else selectCell(column.editorOptions?.editOnClick);
-    onRowClick?.(rowIdx, row, column);
-  }
-
-  function handleMouseDown(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    if (!isCellSelected && !isCellFocused && column.idx !== 0) selectCell();
+    } else if (!isCellFocused) selectCell(column.editorOptions?.editOnClick);
     cellMouseDownHandler(event, rowIdx, column.idx);
+    onRowClick?.(rowIdx, row, column);
   }
 
   function handleDoubleClick() {
@@ -104,7 +99,6 @@ function Cell<R, SR>({
       style={cellStyle}
       onFocus={onFocus}
       onKeyDown={onKeyDown}
-      onClick={wrapEvent(handleClick, onClick)}
       onDoubleClick={wrapEvent(handleDoubleClick, onDoubleClick)}
       onMouseEnter={wrapEvent(handleDragEnter, onMouseEnter)}
       onMouseDown={wrapEvent(handleMouseDown, onMouseDown)}

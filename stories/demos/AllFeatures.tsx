@@ -225,11 +225,11 @@ export default function AllFeatures() {
   styles[3] = [];
   styles[2][3] = {
     classes: ['rdg-cell-highlight'],
-    style: { 'font-weight': 'bold' }
+    style: { fontWeight: 'bold' }
   };
   styles[3][2] = {
     classes: 'rdg-cell-highlight rdg-cell-highlight2',
-    style: { 'text-decoration': 'underline' }
+    style: { textDecoration: 'underline' }
   };
 
   return (
