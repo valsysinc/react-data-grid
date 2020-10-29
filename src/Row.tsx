@@ -13,7 +13,6 @@ function Row<R, SR = unknown>({
   rowIdx,
   isRowSelected,
   copiedCellIdx,
-  draggedOverCellIdx,
   row,
   viewportColumns,
   selectedCellProps,
@@ -23,6 +22,8 @@ function Row<R, SR = unknown>({
   setDraggedOverPos,
   onMouseEnter,
   cellMouseDownHandler,
+  selectedRange,
+  draggedOverRange,
   top,
   'aria-rowindex': ariaRowIndex,
   'aria-selected': ariaSelected,
@@ -38,22 +39,12 @@ function Row<R, SR = unknown>({
     className
   );
 
-  const isCellSelected = function(rowIdx: number, colIdx: number): boolean {
-    const sel = selectedCellProps?.selection;
-    if (!sel) return false;
-    if (selectedCellProps?.idx === colIdx && selectedCellProps?.rowIdx === rowIdx) return false;
-    if (sel.rowStart <= rowIdx && sel.rowEnd >= rowIdx && sel.colStart <= colIdx && sel.colEnd >= colIdx) {
-      return true;
-    }
-    return false;
+  const isCellSelected = function(colIdx: number): boolean {
+    return !!(selectedRange && selectedRange[0] <= colIdx && selectedRange[1] >= colIdx);
   };
 
   const isDraggedOver = function(idx: number): boolean {
-    if (idx === undefined || draggedOverCellIdx === undefined || !selectedCellProps
-    || (idx === selectedCellProps.idx && rowIdx === selectedCellProps.rowIdx)) return false;
-    return draggedOverCellIdx < selectedCellProps?.idx
-      ? idx <= selectedCellProps?.idx && idx >= draggedOverCellIdx
-      : idx >= selectedCellProps?.idx && idx <= draggedOverCellIdx;
+    return !!(draggedOverRange && draggedOverRange[0] <= idx && draggedOverRange[1] >= idx);
   };
 
   return (
@@ -68,8 +59,8 @@ function Row<R, SR = unknown>({
       {...props}
     >
       {viewportColumns.map(column => {
-        const isCellFocused = selectedCellProps?.idx === column.idx && selectedCellProps?.rowIdx === rowIdx;
-        const cellSelected = selectedCellProps?.hasSelectedCells ? isCellSelected(rowIdx, column.idx) : false;
+        const isCellFocused = !!(selectedCellProps && column.idx === selectedCellProps.idx);
+        const cellSelected = !isCellFocused && isCellSelected(column.idx);
 
         if (selectedCellProps?.mode === 'EDIT' && isCellFocused) {
           return (

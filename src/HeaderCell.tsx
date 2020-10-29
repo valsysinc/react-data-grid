@@ -6,6 +6,7 @@ import { HeaderRowProps } from './HeaderRow';
 import SortableHeaderCell from './headerCells/SortableHeaderCell';
 import ResizableHeaderCell from './headerCells/ResizableHeaderCell';
 import { SortDirection } from './enums';
+import EventBus from './EventBus';
 
 function getAriaSort(sortDirection?: SortDirection) {
   switch (sortDirection) {
@@ -29,7 +30,7 @@ export interface HeaderCellProps<R, SR> extends SharedHeaderRowProps<R, SR> {
   column: CalculatedColumn<R, SR>;
   onResize: (column: CalculatedColumn<R, SR>, width: number) => void;
   onAllRowsSelectionChange: (checked: boolean) => void;
-  handleClick: (event: React.MouseEvent<HTMLDivElement>, idx: number) => void;
+  eventBus: EventBus;
 }
 
 export default function HeaderCell<R, SR>({
@@ -40,17 +41,25 @@ export default function HeaderCell<R, SR>({
   sortColumn,
   sortDirection,
   onSort,
-  handleClick
+  eventBus
 }: HeaderCellProps<R, SR>) {
   function getCell() {
     if (!column.headerRenderer) return column.name;
-
     return createElement(column.headerRenderer, { column, allRowsSelected, onAllRowsSelectionChange });
   }
 
   function handleHeaderClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    if ((event.target as Element).className !== 'rdg-header-cell-resizer') handleClick(event, column.idx);
+    if ((event.target as Element).className !== 'rdg-header-cell-resizer') {
+      eventBus.dispatch('SelectCell', {
+        rowIdx: 0,
+        idx: column.idx || 1,
+        sel: {
+          rowStart: 0, rowEnd: -1, colStart: column.idx, colEnd: column.idx || -1
+        }
+      });
+    }
   }
+
 
   let cell = getCell();
 

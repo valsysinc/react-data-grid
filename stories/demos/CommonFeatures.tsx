@@ -284,6 +284,8 @@ export default function CommonFeatures() {
       onSort={handleSort}
       summaryRows={summaryRows}
       className="fill-grid"
+      enableCellDragAndDrop
+      onSelectedCellChange={data => console.log(data)}
     />
   );
 }

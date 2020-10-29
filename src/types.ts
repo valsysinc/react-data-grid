@@ -151,8 +151,6 @@ export interface SharedEditorContainerProps {
 interface SelectedCellPropsBase {
   idx: number;
   rowIdx: number;
-  hasSelectedCells: boolean;
-  selection: GridSelection | undefined;
   onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void;
 }
 
@@ -193,7 +191,6 @@ export interface RowRendererProps<TRow, TSummaryRow = unknown> extends Omit<Reac
   cellStyles: any;
   rowIdx: number;
   copiedCellIdx?: number;
-  draggedOverCellIdx?: number;
   isRowSelected: boolean;
   eventBus: EventBus;
   top: number;
@@ -203,6 +200,8 @@ export interface RowRendererProps<TRow, TSummaryRow = unknown> extends Omit<Reac
   enableDrag: boolean;
   setDraggedOverPos?: (row: number, col: number) => void;
   cellMouseDownHandler: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, rowIdx: number, idx: number) => void;
+  selectedRange: number[] | undefined;
+  draggedOverRange: number[] | undefined;
 }
 
 export interface GroupRowRendererProps<TRow, TSummaryRow = unknown> extends Omit<React.HTMLAttributes<HTMLDivElement>, 'style' | 'children'> {

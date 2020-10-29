@@ -77,7 +77,7 @@ function Cell<R, SR>({
         }
       });
     } else if (!isCellFocused) selectCell(column.editorOptions?.editOnClick);
-    cellMouseDownHandler(event, rowIdx, column.idx);
+    cellMouseDownHandler?.(event, rowIdx, column.idx);
     onRowClick?.(rowIdx, row, column);
   }
 

@@ -4,6 +4,7 @@ import HeaderCell from './HeaderCell';
 import { CalculatedColumn } from './types';
 import { assertIsValidKey } from './utils';
 import { DataGridProps } from './DataGrid';
+import EventBus from './EventBus';
 
 type SharedDataGridProps<R, K extends keyof R, SR> = Pick<DataGridProps<R, K, SR>,
   | 'rows'
@@ -18,11 +19,12 @@ export interface HeaderRowProps<R, K extends keyof R, SR> extends SharedDataGrid
   columns: readonly CalculatedColumn<R, SR>[];
   allRowsSelected: boolean;
   onColumnResize: (column: CalculatedColumn<R, SR>, width: number) => void;
-  handleClick: (event: React.MouseEvent<HTMLDivElement>, idx: number) => void;
+  eventBus: EventBus;
 }
 
 function HeaderRow<R, K extends keyof R, SR>({
   columns,
+  eventBus,
   rows,
   rowKey,
   onSelectedRowsChange,
@@ -30,8 +32,7 @@ function HeaderRow<R, K extends keyof R, SR>({
   onColumnResize,
   sortColumn,
   sortDirection,
-  onSort,
-  handleClick
+  onSort
 }: HeaderRowProps<R, K, SR>) {
   const handleAllRowsSelectionChange = useCallback((checked: boolean) => {
     if (!onSelectedRowsChange) return;
@@ -63,7 +64,7 @@ function HeaderRow<R, K extends keyof R, SR>({
             allRowsSelected={allRowsSelected}
             onAllRowsSelectionChange={handleAllRowsSelectionChange}
             onSort={onSort}
-            handleClick={handleClick}
+            eventBus={eventBus}
             sortColumn={sortColumn}
             sortDirection={sortDirection}
           />

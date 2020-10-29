@@ -237,15 +237,15 @@ function DataGrid<R, K extends keyof R, SR>({
   const [columnWidths, setColumnWidths] = useState<ReadonlyMap<string, number>>(() => new Map());
   const [selectedPosition, setSelectedPosition] = useState<SelectCellState | EditCellState<R>>({ idx: -1, rowIdx: -1, mode: 'SELECT' });
   const [copiedPosition, setCopiedPosition] = useState<Position & { value: unknown } | null>(null);
-  const [selectionType, setSelectionType] = useState<number>(0);
   const [draggedOverPos, setOverPos] = useState<Position | undefined>(undefined);
-
+  const selectionType = useRef(0);
 
   const setDraggedOverPos = useCallback((rowIdx?: number, idx?: number) => {
+    if (selectionType.current === 0) return;
     const pos = rowIdx !== undefined && idx ? { rowIdx, idx } : undefined;
     setOverPos(pos);
     latestDraggedOverPos.current = pos;
-  }, []);
+  }, [selectionType]);
 
   /**
    * refs
@@ -582,7 +582,7 @@ function DataGrid<R, K extends keyof R, SR>({
     }
   }
 
-  function handleDragEnd(rowIdx: number, idx: number, selType: number) {
+  const handleDragEnd = useCallback((rowIdx: number, idx: number, selType: number) => {
     focusSinkRef.current!.focus();
     if (latestDraggedOverPos.current === undefined) return;
 
@@ -592,7 +592,6 @@ function DataGrid<R, K extends keyof R, SR>({
     const value = rawRows[rowIdx][cellKey as keyof R];
     const selRowIdx = dragType === 'row' ? latestDraggedOverPos.current.rowIdx : rowIdx;
     const selColIdx = dragType === 'col' ? latestDraggedOverPos.current.idx : idx;
-
     selectCell({
       rowIdx,
       idx,
@@ -617,14 +616,14 @@ function DataGrid<R, K extends keyof R, SR>({
         action: 'CELL_DRAG'
       });
     }
-  }
+  }, [columns, onRowsUpdate, setDraggedOverPos, rawRows]);
 
-  function cellMouseDownHandler(event: React.MouseEvent<HTMLDivElement, MouseEvent>, rowIdx: number, idx: number) {
+  const cellMouseDownHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>, rowIdx: number, idx: number) => {
     if (event.buttons !== 1) return;
 
     const eventTarget = event.target as HTMLElement;
     const selType = eventTarget.id === 'rdg-drag-handle' ? 2 : 1;
-    setSelectionType(selType);
+    selectionType.current = selType;
 
     window.addEventListener('mouseover', onMouseOver);
     window.addEventListener('mouseup', onMouseUp);
@@ -640,9 +639,9 @@ function DataGrid<R, K extends keyof R, SR>({
       window.removeEventListener('mouseover', onMouseOver);
       window.removeEventListener('mouseup', onMouseUp);
       handleDragEnd(rowIdx, idx, selType);
-      setSelectionType(0);
+      selectionType.current = 0;
     }
-  }
+  }, [handleDragEnd]);
 
   /*function handleDoubleClick(event: React.MouseEvent<HTMLDivElement>) {
     event.stopPropagation();
@@ -679,16 +678,6 @@ function DataGrid<R, K extends keyof R, SR>({
     closeEditor();
   }
 
-  function handleHeaderClick(event: React.MouseEvent<HTMLDivElement>, idx: number) {
-    selectCell({
-      rowIdx: 0,
-      idx: idx || 1,
-      sel: {
-        rowStart: 0, rowEnd: rowsCount - 1, colStart: idx, colEnd: idx || columns.length - 1
-      }
-    });
-  }
-
   /**
    * utils
    */
@@ -709,6 +698,7 @@ function DataGrid<R, K extends keyof R, SR>({
     if (!isCellWithinBounds(position)) return;
 
     if (position.sel?.colEnd === -1) position.sel.colEnd = columns.length - 1;
+    if (position.sel?.rowEnd === -1) position.sel.rowEnd = rowsCount - 1;
     if (position.sel && !isCellSelectionWithinBounds(position.sel)) return;
     commitEditor2Changes();
 
@@ -921,14 +911,14 @@ function DataGrid<R, K extends keyof R, SR>({
     selectCell(nextPos);
   }
 
-  function getDraggedOverCellIdx(currentRowIdx: number): number | undefined {
-    if (draggedOverPos === undefined) return;
+  function getDraggedOverCellsRange(currentRowIdx: number): number[] | undefined {
+    if (draggedOverPos === undefined || selectionType.current === 0) return;
     const { idx, rowIdx } = selectedPosition;
 
     // drag across cols
-    if (selectionType === 2 && Math.abs(idx - draggedOverPos.idx)
+    if (selectionType.current === 2 && Math.abs(idx - draggedOverPos.idx)
     > Math.abs(rowIdx - draggedOverPos.rowIdx)) {
-      return currentRowIdx === rowIdx ? draggedOverPos.idx : undefined;
+      return currentRowIdx === rowIdx ? [idx, draggedOverPos.idx].sort() : undefined;
     }
 
     // drag across rows
@@ -936,29 +926,29 @@ function DataGrid<R, K extends keyof R, SR>({
       ? rowIdx <= currentRowIdx && currentRowIdx <= draggedOverPos.rowIdx
       : rowIdx >= currentRowIdx && currentRowIdx >= draggedOverPos.rowIdx;
 
-    return isDraggedOver ? selectionType !== 2 ? draggedOverPos.idx : idx : undefined;
+    if (!isDraggedOver) return undefined;
+    if (selectionType.current === 1) return [idx, draggedOverPos.idx].sort();
+    if (selectionType.current === 2) return [idx, idx];
+    return undefined;
   }
 
-  const hasSelectedCells = function(rowIdx: number): boolean {
+  const getSelectedCellsRange = function(rowIdx: number): number[] | undefined {
     const sel = selectedPosition?.sel;
-    if (!sel) return false;
+    if (!sel) return undefined;
     if (sel.rowStart <= rowIdx && sel.rowEnd >= rowIdx) {
-      return true;
+      return [sel.colStart, sel.colEnd];
     }
-    return false;
+    return undefined;
   };
 
   function getSelectedCellProps(rowIdx: number): SelectedCellProps | EditCellProps<R> | undefined {
-    const selectedCells = hasSelectedCells(rowIdx);
-    if (selectedPosition.rowIdx !== rowIdx && !selectedCells && !selectionType) return;
+    if (selectedPosition.rowIdx !== rowIdx) return;
 
     if (selectedPosition.mode === 'EDIT') {
       return {
         mode: 'EDIT',
         idx: selectedPosition.idx,
-        hasSelectedCells: selectedCells,
         rowIdx: selectedPosition.rowIdx,
-        selection: selectedPosition.sel,
         onKeyDown: handleKeyDown,
         editorPortalTarget,
         editorContainerProps: {
@@ -982,8 +972,6 @@ function DataGrid<R, K extends keyof R, SR>({
       mode: 'SELECT',
       idx: selectedPosition.idx,
       rowIdx: selectedPosition.rowIdx,
-      hasSelectedCells: selectedCells,
-      selection: selectedPosition.sel,
       onFocus: handleFocus,
       onKeyDown: handleKeyDown
     };
@@ -1048,11 +1036,12 @@ function DataGrid<R, K extends keyof R, SR>({
           rowClass={rowClass}
           top={top}
           copiedCellIdx={copiedPosition?.rowIdx === rowIdx ? copiedPosition.idx : undefined}
-          draggedOverCellIdx={getDraggedOverCellIdx(rowIdx)}
-          setDraggedOverPos={selectionType ? setDraggedOverPos : undefined}
+          setDraggedOverPos={setDraggedOverPos}
           enableDrag={enableCellDragAndDrop}
           selectedCellProps={getSelectedCellProps(rowIdx)}
           cellMouseDownHandler={cellMouseDownHandler}
+          selectedRange={getSelectedCellsRange(rowIdx)}
+          draggedOverRange={getDraggedOverCellsRange(rowIdx)}
         />
       );
     }
@@ -1081,7 +1070,7 @@ function DataGrid<R, K extends keyof R, SR>({
       aria-multiselectable={isSelectable ? true : undefined}
       aria-colcount={columns.length}
       aria-rowcount={headerRowsCount + rowsCount + summaryRowsCount}
-      className={clsx('rdg', { 'rdg-viewport-dragging': selectionType === 2 }, className)}
+      className={clsx('rdg', { 'rdg-viewport-dragging': selectionType.current === 2 }, className)}
       style={{
         ...style,
         '--header-row-height': `${headerRowHeight}px`,
@@ -1097,7 +1086,7 @@ function DataGrid<R, K extends keyof R, SR>({
         rows={rawRows}
         columns={viewportColumns}
         onColumnResize={handleColumnResize}
-        handleClick={handleHeaderClick}
+        eventBus={eventBus}
         allRowsSelected={selectedRows?.size === rawRows.length}
         onSelectedRowsChange={onSelectedRowsChange}
         sortColumn={sortColumn}
