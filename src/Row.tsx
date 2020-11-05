@@ -25,6 +25,7 @@ function Row<R, SR = unknown>({
   selectedRange,
   draggedOverRange,
   top,
+  isReorderingRow,
   'aria-rowindex': ariaRowIndex,
   'aria-selected': ariaSelected,
   ...props
@@ -33,7 +34,8 @@ function Row<R, SR = unknown>({
     'rdg-row',
     `rdg-row-${rowIdx % 2 === 0 ? 'even' : 'odd'}`, {
       'rdg-row-selected': isRowSelected,
-      'rdg-group-row-selected': selectedCellProps?.idx === -1
+      'rdg-group-row-selected': selectedCellProps?.idx === -1,
+      'rdg-cell-reorder-target': isReorderingRow
     },
     rowClass?.(row),
     className
@@ -79,23 +81,23 @@ function Row<R, SR = unknown>({
 
         return (
           <CellRenderer
-            key={column.key}
-            rowIdx={rowIdx}
+            cellMouseDownHandler={cellMouseDownHandler}
+            cellStyles={cellStyles?.[column.idx]}
             column={column}
-            row={row}
+            enableDrag={isCellFocused ? enableDrag : false}
+            eventBus={eventBus}
             isCopied={copiedCellIdx === column.idx}
             isDraggedOver={isDraggedOver(column.idx)}
             isCellFocused={isCellFocused}
+            isCellSelected={cellSelected}
             isRowSelected={isRowSelected}
-            eventBus={eventBus}
+            key={column.key}
             onFocus={isCellFocused ? (selectedCellProps as SelectedCellProps).onFocus : undefined}
             onKeyDown={isCellFocused ? selectedCellProps!.onKeyDown : undefined}
             onRowClick={onRowClick}
-            cellStyles={cellStyles?.[rowIdx]?.[column.idx]}
-            isCellSelected={cellSelected}
-            enableDrag={isCellFocused ? enableDrag : false}
+            row={row}
+            rowIdx={rowIdx}
             setDraggedOverPos={setDraggedOverPos}
-            cellMouseDownHandler={cellMouseDownHandler}
           />
         );
       })}

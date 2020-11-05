@@ -132,7 +132,7 @@ export interface DataGridProps<R, K extends keyof R, SR = unknown> extends Share
   rowGrouper?: (rows: readonly R[], columnKey: string) => Dictionary<readonly R[]>;
   expandedGroupIds?: ReadonlySet<unknown>;
   onExpandedGroupIdsChange?: (expandedGroupIds: Set<unknown>) => void;
-  cellStyles?: unknown;
+  cellStyles?: [];
 
   /**
    * Custom renderers
@@ -242,7 +242,7 @@ function DataGrid<R, K extends keyof R, SR>({
 
   const setDraggedOverPos = useCallback((rowIdx?: number, idx?: number) => {
     if (selectionType.current === 0) return;
-    const pos = rowIdx !== undefined && idx ? { rowIdx, idx } : undefined;
+    const pos = rowIdx !== undefined && idx !== undefined ? { rowIdx, idx } : undefined;
     setOverPos(pos);
     latestDraggedOverPos.current = pos;
   }, [selectionType]);
@@ -443,7 +443,6 @@ function DataGrid<R, K extends keyof R, SR>({
           selectCell(newSelPos);
         }
         setCopiedPosition(null);
-        closeEditor();
         return;
       case 'ArrowUp':
       case 'ArrowDown':
@@ -503,7 +502,6 @@ function DataGrid<R, K extends keyof R, SR>({
       updated,
       action: 'CELL_UPDATE'
     });
-
     closeEditor();
   }
 
@@ -604,7 +602,7 @@ function DataGrid<R, K extends keyof R, SR>({
     });
     setDraggedOverPos();
 
-    if (selType === 2) {
+    if (selType === 2 || selType === 3) {
       onRowsUpdate?.({
         cellKey,
         fromRow: Math.min(rowIdx, selRowIdx),
@@ -622,7 +620,7 @@ function DataGrid<R, K extends keyof R, SR>({
     if (event.buttons !== 1) return;
 
     const eventTarget = event.target as HTMLElement;
-    const selType = eventTarget.id === 'rdg-drag-handle' ? 2 : 1;
+    const selType = eventTarget.id === 'rdg-drag-handle' ? 2 : idx === 0 ? 3 : 1;
     selectionType.current = selType;
 
     window.addEventListener('mouseover', onMouseOver);
@@ -911,6 +909,10 @@ function DataGrid<R, K extends keyof R, SR>({
     selectCell(nextPos);
   }
 
+  function isReorderingRow(currentRowIdx: number): boolean {
+    return selectionType.current === 3 && draggedOverPos?.rowIdx === currentRowIdx;
+  }
+
   function getDraggedOverCellsRange(currentRowIdx: number): number[] | undefined {
     if (draggedOverPos === undefined || selectionType.current === 0) return;
     const { idx, rowIdx } = selectedPosition;
@@ -1025,7 +1027,7 @@ function DataGrid<R, K extends keyof R, SR>({
         <RowRenderer
           aria-rowindex={headerRowsCount + (hasGroups ? startRowIndex : rowIdx) + 1} // aria-rowindex is 1 based
           aria-selected={isSelectable ? isRowSelected : undefined}
-          cellStyles={cellStyles}
+          cellStyles={cellStyles?.[rowIdx]}
           key={key}
           rowIdx={rowIdx}
           row={row}
@@ -1042,6 +1044,7 @@ function DataGrid<R, K extends keyof R, SR>({
           cellMouseDownHandler={cellMouseDownHandler}
           selectedRange={getSelectedCellsRange(rowIdx)}
           draggedOverRange={getDraggedOverCellsRange(rowIdx)}
+          isReorderingRow={isReorderingRow(rowIdx)}
         />
       );
     }

@@ -168,20 +168,20 @@ export interface SelectedCellProps extends SelectedCellPropsBase {
 }
 
 export interface CellRendererProps<TRow, TSummaryRow = unknown> extends Omit<React.HTMLAttributes<HTMLDivElement>, 'style' | 'children'> {
-  rowIdx: number;
+  cellMouseDownHandler: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, rowIdx: number, idx: number) => void;
+  cellStyles: any;
   column: CalculatedColumn<TRow, TSummaryRow>;
-  row: TRow;
+  enableDrag: boolean;
+  eventBus: EventBus;
   isCopied: boolean;
   isDraggedOver: boolean;
   isCellFocused: boolean;
   isCellSelected: boolean;
   isRowSelected: boolean;
-  eventBus: EventBus;
   onRowClick?: (rowIdx: number, row: TRow, column: CalculatedColumn<TRow, TSummaryRow>) => void;
-  cellStyles: any;
-  enableDrag: boolean;
+  row: TRow;
+  rowIdx: number;
   setDraggedOverPos?: (row: number, col: number) => void;
-  cellMouseDownHandler: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, rowIdx: number, idx: number) => void;
 }
 
 export interface RowRendererProps<TRow, TSummaryRow = unknown> extends Omit<React.HTMLAttributes<HTMLDivElement>, 'style' | 'children'> {
@@ -202,6 +202,7 @@ export interface RowRendererProps<TRow, TSummaryRow = unknown> extends Omit<Reac
   cellMouseDownHandler: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, rowIdx: number, idx: number) => void;
   selectedRange: number[] | undefined;
   draggedOverRange: number[] | undefined;
+  isReorderingRow: boolean;
 }
 
 export interface GroupRowRendererProps<TRow, TSummaryRow = unknown> extends Omit<React.HTMLAttributes<HTMLDivElement>, 'style' | 'children'> {
