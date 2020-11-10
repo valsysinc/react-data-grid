@@ -1,5 +1,5 @@
 import React, { useCallback, memo } from 'react';
-
+import clsx from 'clsx';
 import HeaderCell from './HeaderCell';
 import { CalculatedColumn } from './types';
 import { assertIsValidKey } from './utils';
@@ -20,6 +20,8 @@ export interface HeaderRowProps<R, K extends keyof R, SR> extends SharedDataGrid
   allRowsSelected: boolean;
   onColumnResize: (column: CalculatedColumn<R, SR>, width: number) => void;
   eventBus: EventBus;
+  setDraggedOverPos?: (row: number, col: number) => void;
+  isReorderingRow: boolean;
 }
 
 function HeaderRow<R, K extends keyof R, SR>({
@@ -32,8 +34,21 @@ function HeaderRow<R, K extends keyof R, SR>({
   onColumnResize,
   sortColumn,
   sortDirection,
-  onSort
+  onSort,
+  setDraggedOverPos,
+  isReorderingRow
 }: HeaderRowProps<R, K, SR>) {
+  const className = clsx(
+    'rdg-header-row',
+    {
+      'rdg-cell-reorder-target': isReorderingRow
+    }
+  );
+
+  function handleDragEnter() {
+    setDraggedOverPos?.(-1, -1);
+  }
+
   const handleAllRowsSelectionChange = useCallback((checked: boolean) => {
     if (!onSelectedRowsChange) return;
 
@@ -53,7 +68,8 @@ function HeaderRow<R, K extends keyof R, SR>({
     <div
       role="row"
       aria-rowindex={1} // aria-rowindex is 1 based
-      className="rdg-header-row"
+      className={className}
+      onMouseEnter={handleDragEnter}
     >
       {columns.map(column => {
         return (

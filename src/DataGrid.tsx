@@ -590,23 +590,26 @@ function DataGrid<R, K extends keyof R, SR>({
     const value = rawRows[rowIdx][cellKey as keyof R];
     const selRowIdx = dragType === 'row' ? latestDraggedOverPos.current.rowIdx : rowIdx;
     const selColIdx = dragType === 'col' ? latestDraggedOverPos.current.idx : idx;
-    selectCell({
-      rowIdx,
-      idx,
-      sel: {
-        rowStart: dragType === 'row' || selType !== 2 ? Math.min(latestDraggedOverPos.current.rowIdx, rowIdx) : rowIdx,
-        rowEnd: dragType === 'row' || selType !== 2 ? Math.max(latestDraggedOverPos.current.rowIdx, rowIdx) : rowIdx,
-        colStart: dragType === 'col' || selType !== 2 ? Math.min(latestDraggedOverPos.current.idx, idx) : idx,
-        colEnd: dragType === 'col' || selType !== 2 ? Math.max(latestDraggedOverPos.current.idx, idx) : idx
-      }
-    });
+    // avoid selecting when grad started on header
+    if (idx !== 0) {
+      selectCell({
+        rowIdx,
+        idx,
+        sel: {
+          rowStart: dragType === 'row' || selType !== 2 ? Math.min(latestDraggedOverPos.current.rowIdx, rowIdx) : rowIdx,
+          rowEnd: dragType === 'row' || selType !== 2 ? Math.max(latestDraggedOverPos.current.rowIdx, rowIdx) : rowIdx,
+          colStart: dragType === 'col' || selType !== 2 ? Math.min(latestDraggedOverPos.current.idx, idx) : idx,
+          colEnd: dragType === 'col' || selType !== 2 ? Math.max(latestDraggedOverPos.current.idx, idx) : idx
+        }
+      });
+    }
     setDraggedOverPos();
 
     if (selType === 2 || selType === 3) {
       onRowsUpdate?.({
         cellKey,
-        fromRow: Math.min(rowIdx, selRowIdx),
-        toRow: Math.max(rowIdx, selRowIdx),
+        fromRow: selType === 3 ? rowIdx : Math.min(rowIdx, selRowIdx),
+        toRow: selType === 3 ? selRowIdx : Math.max(rowIdx, selRowIdx),
         fromCol: Math.min(idx, selColIdx),
         toCol: Math.max(idx, selColIdx),
         updated: { [cellKey]: value } as unknown as never,
@@ -1095,6 +1098,8 @@ function DataGrid<R, K extends keyof R, SR>({
         sortColumn={sortColumn}
         sortDirection={sortDirection}
         onSort={onSort}
+        setDraggedOverPos={setDraggedOverPos}
+        isReorderingRow={isReorderingRow(-1)}
       />
       {enableFilters && (
         <FilterRow<R, SR>
