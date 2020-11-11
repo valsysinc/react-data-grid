@@ -308,7 +308,11 @@ function DataGrid<R, K extends keyof R, SR>({
         newSelIdx = selectedPosition.sel.colStart !== prevSelectedPosition.current.sel.colStart ? selectedPosition.sel.colStart : selectedPosition.sel.colEnd;
         newSelRowIdx = selectedPosition.sel.rowStart !== prevSelectedPosition.current.sel.rowStart ? selectedPosition.sel.rowStart : selectedPosition.sel.rowEnd;
       }
-      scrollToCell({ idx: newSelIdx, rowIdx: newSelRowIdx });
+      const isFullSelection =
+      (selectedPosition.sel.colStart === selectedPosition.sel.colEnd && selectedPosition.sel.rowStart === 0 && selectedPosition.sel.rowEnd === rowsCount - 1)
+      || (selectedPosition.sel.rowStart === selectedPosition.sel.rowEnd && selectedPosition.sel.colStart === 1 && selectedPosition.sel.colEnd === columns.length - 1)
+      || (selectedPosition.sel.rowStart === 0 && selectedPosition.sel.rowEnd === rowsCount - 1 && selectedPosition.sel.colStart === 0 && selectedPosition.sel.colEnd === columns.length - 1);
+      if (!isFullSelection) scrollToCell({ idx: newSelIdx, rowIdx: newSelRowIdx });
     } else scrollToCell(selectedPosition);
     prevSelectedPosition.current = selectedPosition;
 
