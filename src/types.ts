@@ -182,6 +182,7 @@ export interface CellRendererProps<TRow, TSummaryRow = unknown> extends Omit<Rea
   row: TRow;
   rowIdx: number;
   setDraggedOverPos?: (row: number, col: number) => void;
+  isReorderingRow: boolean;
 }
 
 export interface RowRendererProps<TRow, TSummaryRow = unknown> extends Omit<React.HTMLAttributes<HTMLDivElement>, 'style' | 'children'> {

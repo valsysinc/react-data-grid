@@ -76,7 +76,7 @@ export default function HeaderCell<R, SR>({
     );
   }
 
-  const className = clsx('rdg-cell', column.headerCellClass, {
+  const className = clsx('rdg-cell rdg-header-cell', column.headerCellClass, {
     'rdg-cell-frozen': column.frozen,
     'rdg-cell-frozen-last': column.isLastFrozenColumn,
     'rdg-header-cell-start': column.idx === 0

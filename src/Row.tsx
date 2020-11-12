@@ -90,6 +90,7 @@ function Row<R, SR = unknown>({
             isDraggedOver={isDraggedOver(column.idx)}
             isCellFocused={isCellFocused}
             isCellSelected={cellSelected}
+            isReorderingRow={isReorderingRow}
             isRowSelected={isRowSelected}
             key={column.key}
             onFocus={isCellFocused ? (selectedCellProps as SelectedCellProps).onFocus : undefined}

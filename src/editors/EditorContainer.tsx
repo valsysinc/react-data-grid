@@ -73,6 +73,7 @@ export default function EditorContainer<R, SR>({
   });
 
   function getInitialValue() {
+    console.log('lerow', row);
     const value = row[column.key as keyof R];
     if (key === 'Delete' || key === 'Backspace') {
       return '';

@@ -5,6 +5,8 @@ import { CellRendererProps } from './types';
 import { wrapEvent } from './utils';
 import { useCombinedRefs } from './hooks';
 
+import dragHandle from './img/drag-handle.svg';
+
 function Cell<R, SR>({
   className,
   column,
@@ -14,6 +16,7 @@ function Cell<R, SR>({
   isRowSelected,
   cellStyles,
   isCellSelected,
+  isReorderingRow,
   row,
   rowIdx,
   eventBus,
@@ -41,10 +44,12 @@ function Cell<R, SR>({
     'rdg-cell-copied': isCopied,
     'rdg-cell-selected': isCellSelected,
     'rdg-cell-dragged-over': isDraggedOver,
-    'rdg-row-header-cell': column.idx === 0
+    'rdg-cell-row-header': column.idx === 0,
+    'rdg-row-cell-reordering': isReorderingRow
   };
 
-  const staticCSSClasses = `rdg-cell ${cellStyles?.classes}`;
+  let staticCSSClasses = 'rdg-cell';
+  if (cellStyles) staticCSSClasses += ` ${cellStyles.classes}`;
 
   className = clsx(
     staticCSSClasses,
@@ -53,10 +58,12 @@ function Cell<R, SR>({
     className
   );
 
+  let dragHandleClasses = 'rdg-row-drag-handle';
+  if (isReorderingRow) dragHandleClasses += ' rdg-row-cell-reordering';
+
   const cellStyle = {
     width: column.width,
     left: column.left,
-    ...column.idx && { cursor: 'cell' },
     ...cellStyles?.style
   };
 
@@ -117,6 +124,12 @@ function Cell<R, SR>({
             <div
               id="rdg-drag-handle"
               className="rdg-cell-drag-handle"
+            />
+          )}
+          {column.idx === 0 && (
+            <div
+              id="rdg-reorder-handle"
+              className={dragHandleClasses}
             />
           )}
         </>

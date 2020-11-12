@@ -627,7 +627,9 @@ function DataGrid<R, K extends keyof R, SR>({
     if (event.buttons !== 1) return;
 
     const eventTarget = event.target as HTMLElement;
-    const selType = eventTarget.id === 'rdg-drag-handle' ? 2 : idx === 0 ? 3 : 1;
+    let selType = 1;
+    if (eventTarget.id === 'rdg-drag-handle') selType = 2;
+    else if (eventTarget.id === 'rdg-reorder-handle') selType = 3;
     selectionType.current = selType;
 
     window.addEventListener('mouseover', onMouseOver);
@@ -702,8 +704,13 @@ function DataGrid<R, K extends keyof R, SR>({
   function selectCell(position: Position, enableEditor = false): void {
     if (!isCellWithinBounds(position)) return;
 
-    if (position.sel?.colEnd === -1) position.sel.colEnd = columns.length - 1;
-    if (position.sel?.rowEnd === -1) position.sel.rowEnd = rowsCount - 1;
+    if (position.sel?.colEnd === -1) {
+      if (position.sel.rowEnd !== -1) position.idx = 0;
+      position.sel.colEnd = columns.length - 1;
+    }
+    if (position.sel?.rowEnd === -1) {
+      position.sel.rowEnd = rowsCount - 1;
+    }
     if (position.sel && !isCellSelectionWithinBounds(position.sel)) return;
     commitEditor2Changes();
 

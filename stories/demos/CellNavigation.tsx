@@ -106,6 +106,7 @@ export default function CellNavigation() {
         columns={columns}
         rows={rows}
         cellNavigationMode={cellNavigatioMode}
+        className="rdg-light"
       />
     </>
   );

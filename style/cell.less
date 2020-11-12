@@ -7,10 +7,19 @@
   border-right: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
   background-color: inherit;
+  cursor: cell;
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.rdg-cell-row-header {
+  background-color: var(--header-background-color);
+  font-weight: bold;
+  cursor: e-resize;
+  text-align: right;
+  padding-left: 38px;
 }
 
 .rdg-cell-frozen {
@@ -44,7 +53,7 @@
 }
 
 .rdg-cell-copied.rdg-cell-dragged-over {
-  background-color: #66afe9;
+  background-color: var(--selection-color);
 }
 
 .rdg-cell-editing {
@@ -52,9 +61,13 @@
 }
 
 .rdg-cell-selected {
-  background-color: #66afe9;
+  background-color: var(--selected-color);
 }
 
 .rdg-cell-dragged-over {
-  background-color: rgba(102,175,233,0.5);
+  background-color: var(--dragging-color);
+}
+
+.rdg-row-cell-reordering {
+  cursor: grabbing;
 }

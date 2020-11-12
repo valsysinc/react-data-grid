@@ -32,6 +32,25 @@
   }
 }
 
+.rdg-row-drag-handle {
+  cursor: grab;
+  position: absolute;
+  left: 10px;
+  top: 0px;
+  width: 13px;
+  height: 10px;
+  padding: 0px 2px;
+  margin: 5px 0;
+  border-top: 3px dotted var(--border-color);
+  border-bottom: 3px dotted var(--border-color);
+}
+
+
 .rdg-cell-reorder-target {
-  border-bottom: 2px solid black;
+  cursor: grabbing;
+  border-bottom: 2px solid var(--selection-color);
+}
+
+.rdg-row-drag-handle:active {
+  cursor: grabbing;
 }
