@@ -5,8 +5,6 @@ import { CellRendererProps } from './types';
 import { wrapEvent } from './utils';
 import { useCombinedRefs } from './hooks';
 
-import dragHandle from './img/drag-handle.svg';
-
 function Cell<R, SR>({
   className,
   column,
