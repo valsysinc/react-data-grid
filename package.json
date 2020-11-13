@@ -8,7 +8,10 @@
     "react-data-grid",
     "data-grid"
   ],
-  "repository": "github:valsysinc/react-data-grid",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/valsysinc/react-data-grid.git"
+  },
   "bugs": {
     "url": "https://github.com/valsysinc/react-data-grid/issues"
   },
@@ -93,5 +96,10 @@
   "peerDependencies": {
     "react": "^16.8 || ^17.0",
     "react-dom": "^16.8 || ^17.0"
-  }
+  },
+  "homepage": "https://github.com/valsysinc/react-data-grid#readme",
+  "directories": {
+    "lib": "lib"
+  },
+  "author": "valsys"
 }
