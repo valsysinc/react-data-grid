@@ -585,7 +585,6 @@ function DataGrid<R, K extends keyof R, SR>({
   }
 
   const handleDragEnd = useCallback((rowIdx: number, idx: number, selType: number) => {
-    focusSinkRef.current!.focus();
     if (latestDraggedOverPos.current === undefined) return;
 
     const column = columns[idx];
@@ -594,16 +593,30 @@ function DataGrid<R, K extends keyof R, SR>({
     const value = rawRows[rowIdx][cellKey as keyof R];
     const selRowIdx = dragType === 'row' ? latestDraggedOverPos.current.rowIdx : rowIdx;
     const selColIdx = dragType === 'col' ? latestDraggedOverPos.current.idx : idx;
-    // avoid selecting when grad started on header
+    // normal cell selection
     if (idx !== 0) {
+      const sel = {
+        rowStart: dragType === 'row' || selType !== 2 ? Math.min(latestDraggedOverPos.current.rowIdx, rowIdx) : rowIdx,
+        rowEnd: dragType === 'row' || selType !== 2 ? Math.max(latestDraggedOverPos.current.rowIdx, rowIdx) : rowIdx,
+        colStart: dragType === 'col' || selType !== 2 ? Math.min(latestDraggedOverPos.current.idx, idx) : idx,
+        colEnd: dragType === 'col' || selType !== 2 ? Math.max(latestDraggedOverPos.current.idx, idx) : idx
+      };
+      if (sel.colStart === 0) sel.colStart = 1;
+      selectCell({
+        rowIdx,
+        idx,
+        sel
+      });
+    } else if (selType === 1) {
+      // row headers selection
       selectCell({
         rowIdx,
         idx,
         sel: {
-          rowStart: dragType === 'row' || selType !== 2 ? Math.min(latestDraggedOverPos.current.rowIdx, rowIdx) : rowIdx,
-          rowEnd: dragType === 'row' || selType !== 2 ? Math.max(latestDraggedOverPos.current.rowIdx, rowIdx) : rowIdx,
-          colStart: dragType === 'col' || selType !== 2 ? Math.min(latestDraggedOverPos.current.idx, idx) : idx,
-          colEnd: dragType === 'col' || selType !== 2 ? Math.max(latestDraggedOverPos.current.idx, idx) : idx
+          rowStart: Math.min(latestDraggedOverPos.current.rowIdx, rowIdx),
+          rowEnd: Math.max(latestDraggedOverPos.current.rowIdx, rowIdx),
+          colStart: idx,
+          colEnd: -1
         }
       });
     }

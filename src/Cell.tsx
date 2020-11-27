@@ -70,6 +70,7 @@ function Cell<R, SR>({
   }
 
   function handleMouseDown(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    event.preventDefault();
     if (column.idx === 0) {
       eventBus.dispatch('SelectCell', {
         rowIdx,
