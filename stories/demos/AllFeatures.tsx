@@ -231,6 +231,9 @@ export default function AllFeatures() {
     classes: 'rdg-cell-highlight rdg-cell-highlight2',
     style: { textDecoration: 'underline' }
   };
+  styles[3][3] = {
+    loading: true
+  };
 
   return (
     <div className="all-features">

@@ -47,7 +47,11 @@ function Cell<R, SR>({
   };
 
   let staticCSSClasses = 'rdg-cell';
-  if (cellStyles) staticCSSClasses += ` ${cellStyles.classes}`;
+  if (cellStyles?.loading) {
+    if (cellStyles.classes) cellStyles.classes += ' rdg-cell-loading';
+    else cellStyles.classes = 'rdg-cell-loading';
+  }
+  if (cellStyles?.classes) staticCSSClasses += ` ${cellStyles.classes}`;
 
   className = clsx(
     staticCSSClasses,
@@ -132,6 +136,9 @@ function Cell<R, SR>({
             />
           )}
         </>
+      )}
+      {cellStyles?.loading && (
+        <div className="rdg-loading" />
       )}
     </div>
   );

@@ -67,3 +67,43 @@
 .rdg-cell-dragged-over {
   background-color: var(--dragging-color);
 }
+
+.rdg-cell-loading {
+  /* Hide the text. */
+  text-align: initial!important;
+  text-indent: -99999px;
+}
+
+.rdg-loading {
+  animation: skeleton-fade-in .3s linear forwards,skeleton-glow 1s linear infinite alternate;
+  animation-delay: 0s,.3s;
+  height: 5px;
+  background-clip: padding-box!important;
+  border-color: rgba(206,217,224,.2)!important;
+  border-radius: 4px;
+  box-shadow: none!important;
+  color: transparent!important;
+  margin: 0 15px;
+  width: calc(100% - 45px);
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translate(0, -50%);
+  margin-left: 20px;
+}
+
+@keyframes skeleton-fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes skeleton-glow {
+  0% {
+    background: rgba(206,217,224,.2);
+    border-color: rgba(206,217,224,.2);
+  }
+  100% {
+    background: rgba(92,112,128,.2);
+    border-color: rgba(92,112,128,.2);
+  }
+}
