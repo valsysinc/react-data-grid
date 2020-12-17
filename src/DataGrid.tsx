@@ -469,7 +469,7 @@ function DataGrid<R, K extends keyof R, SR>({
         else handleCellInput(event);
         break;
       default:
-        handleCellInput(event);
+        if (!ctrlKey) handleCellInput(event);
         break;
     }
   }

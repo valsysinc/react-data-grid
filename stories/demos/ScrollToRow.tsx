@@ -8,7 +8,7 @@ interface Row {
 }
 
 const columns: readonly Column<Row>[] = [
-  { key: 'id', name: 'ID' },
+  { key: 'id', name: 'ID', editable: true },
   { key: 'title', name: 'Title' },
   { key: 'count', name: 'Count' }
 ];
