@@ -113,10 +113,11 @@ export default function EditorContainer<R, SR>({
     return true;
   }
 
-  function preventDefaultNavigation(key: string): boolean {
+  function preventDefaultNavigation(key: string, shift: boolean): boolean {
     return (key === 'ArrowLeft' && !isCaretAtBeginningOfInput())
       || (key === 'ArrowRight' && !isCaretAtEndOfInput())
       || (key === 'Escape' && editorIsSelectOpen())
+      || (key === ' ' && shift)
       || (['ArrowUp', 'ArrowDown'].includes(key) && editorHasResults());
   }
 
@@ -131,7 +132,7 @@ export default function EditorContainer<R, SR>({
   }
 
   function onKeyDown(e: KeyboardEvent) {
-    if (preventDefaultNavigation(e.key)) {
+    if (preventDefaultNavigation(e.key, e.shiftKey)) {
       e.stopPropagation();
     } else if (['Enter', 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
       commit();
