@@ -66,6 +66,7 @@ export interface DataGridHandle {
   scrollToColumn: (colIdx: number) => void;
   scrollToRow: (rowIdx: number) => void;
   selectCell: (position: Position, openEditor?: boolean) => void;
+  focusGrid: () => void;
 }
 
 type SharedDivProps = Pick<React.HTMLAttributes<HTMLDivElement>,
@@ -394,7 +395,8 @@ function DataGrid<R, K extends keyof R, SR>({
       if (!current) return;
       current.scrollTop = rowIdx * rowHeight;
     },
-    selectCell
+    selectCell,
+    focusGrid
   }));
 
   /**
@@ -476,6 +478,10 @@ function DataGrid<R, K extends keyof R, SR>({
 
   function handleFocus() {
     isCellFocusable.current = true;
+  }
+
+  function focusGrid() {
+    focusSinkRef.current!.focus();
   }
 
   function handleScroll(event: React.UIEvent<HTMLDivElement>) {
