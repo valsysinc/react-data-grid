@@ -4,7 +4,7 @@ import { CalculatedColumn } from '../types';
 export interface ResizableHeaderCellProps<R, SR> {
   children: React.ReactElement<React.ComponentProps<'div'>>;
   column: CalculatedColumn<R, SR>;
-  onResize: (column: CalculatedColumn<R, SR>, width: number) => void;
+  onResize: (column: CalculatedColumn<R, SR>, width: number, mouseDown: boolean) => void;
 }
 
 export default function ResizableHeaderCell<R, SR>({
@@ -26,10 +26,11 @@ export default function ResizableHeaderCell<R, SR>({
     }
 
     const onMouseMove = (event: MouseEvent) => {
-      handleResize(event.clientX + offset, currentTarget);
+      handleResize(event.clientX + offset, currentTarget, true);
     };
 
-    const onMouseUp = () => {
+    const onMouseUp = (event: MouseEvent) => {
+      handleResize(event.clientX + offset, currentTarget, false);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
     };
@@ -60,13 +61,14 @@ export default function ResizableHeaderCell<R, SR>({
     const onTouchMove = (event: TouchEvent) => {
       const touch = getTouch(event);
       if (touch) {
-        handleResize(touch.clientX + offset, currentTarget);
+        handleResize(touch.clientX + offset, currentTarget, true);
       }
     };
 
     const onTouchEnd = (event: TouchEvent) => {
       const touch = getTouch(event);
       if (!touch) return;
+      handleResize(touch.clientX + offset, currentTarget, false);
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
     };
@@ -75,10 +77,10 @@ export default function ResizableHeaderCell<R, SR>({
     window.addEventListener('touchend', onTouchEnd);
   }
 
-  function handleResize(x: number, target: Element) {
+  function handleResize(x: number, target: Element, mouseDown: boolean) {
     const width = x - target.getBoundingClientRect().left;
     if (width > 0) {
-      onResize(column, width);
+      onResize(column, width, mouseDown);
     }
   }
 

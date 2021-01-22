@@ -18,7 +18,7 @@ type SharedDataGridProps<R, K extends keyof R, SR> = Pick<DataGridProps<R, K, SR
 export interface HeaderRowProps<R, K extends keyof R, SR> extends SharedDataGridProps<R, K, SR> {
   columns: readonly CalculatedColumn<R, SR>[];
   allRowsSelected: boolean;
-  onColumnResize: (column: CalculatedColumn<R, SR>, width: number) => void;
+  onColumnResize: (column: CalculatedColumn<R, SR>, width: number, mouseDown: boolean) => void;
   eventBus: EventBus;
   setDraggedOverPos?: (row: number, col: number) => void;
   isReorderingRow: boolean;

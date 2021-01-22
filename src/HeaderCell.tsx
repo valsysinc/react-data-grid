@@ -28,7 +28,7 @@ type SharedHeaderRowProps<R, SR> = Pick<HeaderRowProps<R, never, SR>,
 
 export interface HeaderCellProps<R, SR> extends SharedHeaderRowProps<R, SR> {
   column: CalculatedColumn<R, SR>;
-  onResize: (column: CalculatedColumn<R, SR>, width: number) => void;
+  onResize: (column: CalculatedColumn<R, SR>, width: number, mouseDown: boolean) => void;
   onAllRowsSelectionChange: (checked: boolean) => void;
   eventBus: EventBus;
 }
