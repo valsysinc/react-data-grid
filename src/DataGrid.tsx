@@ -134,6 +134,7 @@ export interface DataGridProps<R, K extends keyof R, SR = unknown> extends Share
   expandedGroupIds?: ReadonlySet<unknown>;
   onExpandedGroupIdsChange?: (expandedGroupIds: Set<unknown>) => void;
   cellStyles?: [];
+  reorderRows: boolean;
 
   /**
    * Custom renderers
@@ -227,7 +228,8 @@ function DataGrid<R, K extends keyof R, SR>({
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
   'aria-describedby': ariaDescribedBy,
-  cellStyles
+  cellStyles,
+  reorderRows
 }: DataGridProps<R, K, SR>, ref: React.Ref<DataGridHandle>) {
   /**
    * states
@@ -1079,6 +1081,7 @@ function DataGrid<R, K extends keyof R, SR>({
           cellMouseDownHandler={cellMouseDownHandler}
           selectedRange={getSelectedCellsRange(rowIdx)}
           draggedOverRange={getDraggedOverCellsRange(rowIdx)}
+          reorderRows={reorderRows}
           isReorderingRow={isReorderingRow(rowIdx)}
         />
       );
@@ -1096,7 +1099,8 @@ function DataGrid<R, K extends keyof R, SR>({
 
   if (selectedPosition.mode === 'EDIT' && rows[selectedPosition.rowIdx] !== selectedPosition.originalRow) {
     // Discard changes if rows are updated from outside
-    closeEditor();
+    // We need to avoid this to keep row headers editable when a temp row becomes non temp and header is still being named
+    //closeEditor();
   }
 
   return (

@@ -15,6 +15,7 @@ function Cell<R, SR>({
   cellStyles,
   isCellSelected,
   isReorderingRow,
+  reorderRows,
   row,
   rowIdx,
   eventBus,
@@ -129,7 +130,7 @@ function Cell<R, SR>({
               className="rdg-cell-drag-handle"
             />
           )}
-          {column.idx === 0 && (
+          {reorderRows && column.idx === 0 && (
             <div
               id="rdg-reorder-handle"
               className={dragHandleClasses}

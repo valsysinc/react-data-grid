@@ -26,6 +26,7 @@ function Row<R, SR = unknown>({
   draggedOverRange,
   top,
   isReorderingRow,
+  reorderRows,
   'aria-rowindex': ariaRowIndex,
   'aria-selected': ariaSelected,
   ...props
@@ -63,7 +64,6 @@ function Row<R, SR = unknown>({
       {viewportColumns.map(column => {
         const isCellFocused = !!(selectedCellProps && column.idx === selectedCellProps.idx);
         const cellSelected = !isCellFocused && isCellSelected(column.idx);
-
         if (selectedCellProps?.mode === 'EDIT' && isCellFocused) {
           return (
             <EditCell<R, SR>
@@ -96,6 +96,7 @@ function Row<R, SR = unknown>({
             onFocus={isCellFocused ? (selectedCellProps as SelectedCellProps).onFocus : undefined}
             onKeyDown={isCellFocused ? selectedCellProps!.onKeyDown : undefined}
             onRowClick={onRowClick}
+            reorderRows={reorderRows}
             row={row}
             rowIdx={rowIdx}
             setDraggedOverPos={setDraggedOverPos}

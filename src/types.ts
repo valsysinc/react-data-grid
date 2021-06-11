@@ -183,6 +183,7 @@ export interface CellRendererProps<TRow, TSummaryRow = unknown> extends Omit<Rea
   rowIdx: number;
   setDraggedOverPos?: (row: number, col: number) => void;
   isReorderingRow: boolean;
+  reorderRows: boolean;
 }
 
 export interface RowRendererProps<TRow, TSummaryRow = unknown> extends Omit<React.HTMLAttributes<HTMLDivElement>, 'style' | 'children'> {
@@ -204,6 +205,7 @@ export interface RowRendererProps<TRow, TSummaryRow = unknown> extends Omit<Reac
   selectedRange: number[] | undefined;
   draggedOverRange: number[] | undefined;
   isReorderingRow: boolean;
+  reorderRows: boolean;
 }
 
 export interface GroupRowRendererProps<TRow, TSummaryRow = unknown> extends Omit<React.HTMLAttributes<HTMLDivElement>, 'style' | 'children'> {
